@@ -1,25 +1,7 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Pia is my AI-powered personal investment assistant
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-# pia
+- I am open sourcing this to show my thoughts on how I'm incorporating AI into something useful and value add for my personal life.
+- I am not accepting contributions yet, but I'm open to feedback and suggestions.
+- I plan to blog a bit about the process of building this and how I'm using AI to help me make well-informed investment and trading decisions at [my blog](https://www.wellingtonjohnson.com).
