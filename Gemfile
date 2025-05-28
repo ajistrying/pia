@@ -61,11 +61,15 @@ gem "aasm"
 
 gem "interactor", "~> 3.0"
 
+gem 'faraday'
+
+# HTML templating
+gem "slim"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem "letter_opener"
-  gem "annotaterb"
   gem "better_errors"
   gem "rspec-rails", "~> 7.1.1"
   gem "dotenv"
@@ -74,6 +78,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  group :development do
+  gem 'annotate', git: 'https://github.com/ctran/annotate_models.git'
+end
 
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"

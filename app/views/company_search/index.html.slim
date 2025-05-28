@@ -1,0 +1,25 @@
+.container style="height: 100vh; padding-top: 400px;"
+    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center
+        h2.title.is-2 Pia
+        h3.subtitle.is-3 Analyze companies with AI-powered insights
+        .field.has-addons data-controller="company-search"
+            .control.has-icons-left
+                input.input.is-large type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
+                span.icon.is-medium.is-left
+                    = icon "search", library: "lucide", class: "w-10 h-10"
+
+        #search-results data-company-search-target="results"
+    
+        .is-flex.is-flex-direction-column.is-align-content-flex-start.is-align-items-flex-start
+            h2.title.is-4 Existing Workspaces
+            - if @workspaces.any?
+                div.is-flex-direction-column
+                    - @workspaces.each do |workspace|
+                        div.is-flex.is-justify-content-space-between.is-align-items-center.mt-2
+                            div.is-flex-direction-row
+                                span.mr-2 = workspace.ticker
+                                span.has-text-weight-normal = workspace.company_name
+                            div
+                                = link_to "Analyze", company_workspace_path(workspace), method: :get, class: "button is-small is-primary", data: { turbo_method: :get }
+            - else
+                p.has-text-grey-light No existing workspaces
