@@ -11,6 +11,10 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
+# Indexes
+#
+#  index_company_workspaces_on_company_symbol_and_company_name  (company_symbol,company_name) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe CompanyWorkspace, type: :model do

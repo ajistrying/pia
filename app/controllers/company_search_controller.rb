@@ -19,6 +19,14 @@ class CompanySearchController < ApplicationController
       if result.success?    
         @error = nil
         @companies = result.response_result
+        
+        # Batch check for existing workspaces
+        existing_workspaces = CompanyWorkspace.where(
+          company_symbol: @companies.map { |c| c["symbol"] },
+          company_name: @companies.map { |c| c["name"] }
+        ).pluck(:company_symbol, :company_name)
+        
+        @existing_workspaces = existing_workspaces.map { |symbol, name| [symbol, name] }.to_h
       else
         @error = result.error
       end

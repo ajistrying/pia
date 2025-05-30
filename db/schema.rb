@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_30_034214) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_30_042318) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_30_034214) do
     t.datetime "updated_at", null: false
     t.datetime "last_successful_update"
     t.datetime "initialized_at"
+    t.index ["company_symbol", "company_name"], name: "index_company_workspaces_on_company_symbol_and_company_name", unique: true
   end
 
   create_table "earnings_calls", force: :cascade do |t|
