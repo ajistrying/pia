@@ -1,6 +1,14 @@
-# README
+## Table of Contents 📖
 
-## 🤖💸 Pia is my very much in progress AI-powered personal investment assistant 💸🤖
+- [Table of Contents 📖](#table-of-contents-)
+- [General Idea 💡](#general-idea-)
+- [Tech Stack 💻](#tech-stack-)
+- [Coming soon](#coming-soon)
+  - [General Architecture 🏗️](#general-architecture-️)
+  - [Feature Set 📋](#feature-set-)
+  - [General Backing Investing Philosophy 💰](#general-backing-investing-philosophy-)
+
+## General Idea 💡
 
 I wanted to use AI to help me make more deeply-informed investment and trading decisions, so I thought I'd build a personal investment assistant and open source the entire process. The goal of open sourcing this is to showcase my thoughts on how I'm incorporating AI into something useful and value add for my personal life. Doing this from the very beginning also means that it's going to go through a lot of changes and iterations, and I'll be documenting the process on [my blog](https://www.wellingtonjohnson.com), I'd love it if you followed along there.
 
@@ -10,11 +18,22 @@ Feel free to reach out to me if you have any questions or suggestions. I will no
 
 Thanks
 
+## Tech Stack 💻
+
+- [Ruby on Rails](https://rubyonrails.org/) (Main application framework)
+- [Bulma](https://bulma.io/) (Styling)
+- [PostgreSQL](https://www.postgresql.org/) (Bread and butter relational database)
+- [Redis](https://redis.io/) (Bread and butter key-value store for background jobs and caching)
+- [Sidekiq](https://sidekiq.org/) (Background job processing framework)
+- [RSpec](https://rspec.info/) (Testing framework)
+- [Hotwire](https://hotwired.dev/) (Turbo + Stimulus for frontend interactivity)
+- [FinancialModelingPrep API](https://financialmodelingprep.com/) (Financial data needs, pretty comprehensive and good free tier, wll upgrade to paid tier eventually)
+- Assorted Generative AI Models used for summarization, analysis, vectorization, and more
+
 
 ## Coming soon
 
-### Tech Stack
-### General Architecture
-### Feature Set
-### General Backing Investing Philosophy
+### General Architecture 🏗️
+### Feature Set 📋
+### General Backing Investing Philosophy 💰
 
