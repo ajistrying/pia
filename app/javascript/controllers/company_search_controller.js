@@ -7,6 +7,16 @@ export default class extends Controller {
 	connect() {
 		this.timeout = null;
 		this.inputTarget.value = "";
+		// Hide results on connect
+		if (this.hasResultsTarget) {
+			this.resultsTarget.style.display = "none";
+		}
+
+		// Add event listeners for closing results
+		this.handleOutsideClick = this.handleOutsideClick.bind(this);
+		this.handleEscapeKey = this.handleEscapeKey.bind(this);
+		document.addEventListener("click", this.handleOutsideClick);
+		document.addEventListener("keydown", this.handleEscapeKey);
 	}
 
 	search() {
@@ -31,17 +41,40 @@ export default class extends Controller {
 					.then((response) => response.text())
 					.then((html) => {
 						Turbo.renderStreamMessage(html);
+						// Show results container after rendering
+						if (this.hasResultsTarget) {
+							this.resultsTarget.style.display = "block";
+						}
 					});
 			} else {
 				// Clear results if query is empty
 				if (this.hasResultsTarget) {
 					this.resultsTarget.innerHTML = "";
+					this.resultsTarget.style.display = "none";
 				}
 			}
 		}, 2000); // 2 second delay
 	}
 
+	handleOutsideClick(event) {
+		// Close results if clicking outside the search container
+		if (!this.element.contains(event.target) && this.hasResultsTarget) {
+			this.resultsTarget.style.display = "none";
+		}
+	}
+
+	handleEscapeKey(event) {
+		// Close results on Escape key
+		if (event.key === "Escape" && this.hasResultsTarget) {
+			this.resultsTarget.style.display = "none";
+			this.inputTarget.blur(); // Remove focus from input
+		}
+	}
+
 	disconnect() {
 		clearTimeout(this.timeout);
+		// Remove event listeners
+		document.removeEventListener("click", this.handleOutsideClick);
+		document.removeEventListener("keydown", this.handleEscapeKey);
 	}
 }

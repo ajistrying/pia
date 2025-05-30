@@ -37,3 +37,9 @@
 // @import "bulma/sass/layout/section.sass";
 
 @import 'bulma/bulma';
+
+.workspace-card {
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}

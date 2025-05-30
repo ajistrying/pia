@@ -1,25 +1,21 @@
-.container style="height: 100vh; padding-top: 400px;"
-    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center
-        h2.title.is-2 Pia
-        h3.subtitle.is-3 Analyze companies with AI-powered insights
-        .field.has-addons data-controller="company-search"
-            .control.has-icons-left
-                input.input.is-large type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
-                span.icon.is-medium.is-left
-                    = icon "search", library: "lucide", class: "w-10 h-10"
-
-        #search-results data-company-search-target="results"
+.container.is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="height: 100vh;"
+    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="width: 80%"
+        h3.title.is-3 Pia
+        h4.subtitle.is-4 Analyze companies with AI-powered insights
+        div data-controller="company-search" style="position: relative;"
+            .field.has-addons.mt-4
+                .control.has-icons-left
+                    input.input.is-large type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
+                    span.icon.is-medium.is-left
+                        = icon "search", library: "lucide", class: "w-10 h-10"
+            .mt-2#search-results data-company-search-target="results" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 10; display: none;"
     
-        .is-flex.is-flex-direction-column.is-align-content-flex-start.is-align-items-flex-start
-            h2.title.is-4 Existing Workspaces
-            - if @workspaces.any?
-                div.is-flex-direction-column
+    .is-flex.is-flex-direction-column.mt-4 style="width: 80%"
+        h2.title.is-4 Existing Workspaces
+        - if @workspaces.any?
+            .fixed-grid.has-2-cols.mt-4
+                .grid
                     - @workspaces.each do |workspace|
-                        div.is-flex.is-justify-content-space-between.is-align-items-center.mt-2
-                            div.is-flex-direction-row
-                                span.mr-2 = workspace.ticker
-                                span.has-text-weight-normal = workspace.company_name
-                            div
-                                = link_to "Analyze", company_workspace_path(workspace), method: :get, class: "button is-small is-primary", data: { turbo_method: :get }
-            - else
-                p.has-text-grey-light No existing workspaces
+                        = render Workspace::CardComponent.new(workspace: workspace)
+        - else
+            p.has-text-grey-light No existing workspaces, start by searching for a company.
