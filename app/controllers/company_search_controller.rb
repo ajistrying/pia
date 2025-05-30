@@ -1,5 +1,6 @@
 class CompanySearchController < ApplicationController
   def index
+    # TODO: After implementing initialization, we can remove this hardcoded list
     # @workspaces = CompanyWorkspace.all
     @workspaces = [
       OpenStruct.new(company_name: "Apple Inc.", company_symbol: "AAPL"),

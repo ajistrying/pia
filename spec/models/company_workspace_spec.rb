@@ -2,12 +2,14 @@
 #
 # Table name: company_workspaces
 #
-#  id             :bigint           not null, primary key
-#  company_symbol :string
-#  company_name   :string
-#  description    :text
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
+#  id                     :bigint           not null, primary key
+#  company_name           :string
+#  company_symbol         :string
+#  description            :text
+#  initialized_at         :datetime
+#  last_successful_update :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
 #
 require 'rails_helper'
 

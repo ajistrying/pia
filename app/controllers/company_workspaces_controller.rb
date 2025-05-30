@@ -1,5 +1,5 @@
 class CompanyWorkspacesController < ApplicationController
-  before_action :ensure_workspace_initialized, only: [:show]
+  before_action :ensure_up_to_date_workspace, only: [:show]
 
   def create
     @workspace = CompanyWorkspace.create(workspace_params)
@@ -12,22 +12,26 @@ class CompanyWorkspacesController < ApplicationController
   private
 
   def workspace_params
-    params.require(:company_workspace).permit(:ticker, :company_name)
+    params.require(:company_workspace).permit(:company_symbol, :company_name)
   end
 
-  def ensure_workspace_initialized
+  def ensure_up_to_date_workspace
     @workspace = CompanyWorkspace.find(params[:id])
 
-    if @workspace.initialized_at.present?
-      result = FinancialModelingPrep::UpdateWorkspace.call(workspace: @workspace)
-    else
+    return if @workspace.up_to_date?
+
+    if @workspace.initialized_at.nil?
       result = FinancialModelingPrep::InitializeWorkspace.call(workspace: @workspace)
+      if result.failure?
+        @error = result.error
+      end
+    else
+      result = FinancialModelingPrep::UpdateWorkspace.call(workspace: @workspace)
+      if result.failure?
+        @error = result.error
+      end
     end
 
-    if result.failure?
-      @error = result.error
-    else
-      @workspace = result.response_result
-    end
+    redirect_to company_workspace_path(@workspace), alert: @error if @error.present?
   end
 end

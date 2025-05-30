@@ -2,12 +2,14 @@
 #
 # Table name: company_workspaces
 #
-#  id             :bigint           not null, primary key
-#  company_symbol :string
-#  company_name   :string
-#  description    :text
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
+#  id                     :bigint           not null, primary key
+#  company_name           :string
+#  company_symbol         :string
+#  description            :text
+#  initialized_at         :datetime
+#  last_successful_update :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
 #
 class CompanyWorkspace < ApplicationRecord
   has_many :sec_filings, dependent: :destroy
@@ -16,4 +18,8 @@ class CompanyWorkspace < ApplicationRecord
   has_many :financial_statements, dependent: :destroy
   has_many :news_pieces, dependent: :destroy
   has_many :research_reports, dependent: :destroy
+
+  def up_to_date?
+    initialized_at.present? && last_successful_update && last_successful_update > 2.days.ago
+  end
 end

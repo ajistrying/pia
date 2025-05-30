@@ -14,7 +14,7 @@
                   span.mr-2 = company["symbol"]
                   span.has-text-weight-normal = company["name"]
                 div
-                  = link_to "Analyze", company_workspaces_path(ticker: company["symbol"]), method: :post, class: "button is-small is-primary", data: { turbo_method: :post }
+                  = link_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "button is-small is-primary", data: { turbo: false }
     - elsif @query.present?
       .notification.is-warning.is-light.mt-4
         p No companies found matching "#{@query}" 
