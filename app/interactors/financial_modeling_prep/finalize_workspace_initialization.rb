@@ -2,7 +2,13 @@ class FinancialModelingPrep::FinalizeWorkspaceInitialization
   include Interactor
 
   def call
-    context.workspace.update(initialized_at: Time.current)
+    # Simulate some processing time as requested
+    sleep 3 if Rails.env.development?
+    
+    context.workspace.update(
+      initialized_at: Time.current,
+      last_successful_update: Time.current
+    )
     # TODO: More to come here
   end
 end

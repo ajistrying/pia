@@ -17,7 +17,7 @@
                   - if @existing_workspaces[[company["symbol"], company["name"]]]
                     span.has-text-weight-normal Workspace already exists
                   - else
-                    = link_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "button is-small is-primary", data: { turbo: false }
+                    = button_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "button is-small is-primary", data: { turbo: false }
     - elsif @query.present?
       .notification.is-warning.is-light.mt-4
         p No companies found matching "#{@query}" 

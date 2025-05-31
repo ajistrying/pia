@@ -1,0 +1,12 @@
+= turbo_frame_tag "workspace-content"
+  .notification.is-danger
+    .content
+      h3.title.is-5 Error Loading Workspace
+      
+      p
+        = error || "An unexpected error occurred while loading the workspace data."
+      
+      .buttons.mt-4
+        = link_to "Retry", company_workspace_path(@workspace), 
+          class: "button is-danger",
+          data: { turbo_frame: "_top" } 

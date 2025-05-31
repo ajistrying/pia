@@ -1,0 +1,11 @@
+.container
+  .section
+    h1.title.is-2 = @workspace.company_name
+    
+    / Subscribe to Turbo Stream updates for this workspace
+    = turbo_stream_from "workspace_#{@workspace.id}"
+    
+    / Turbo Frame with lazy loading
+    = turbo_frame_tag "workspace-content", src: workspace_content_company_workspace_path(@workspace), loading: :lazy do
+      / This will be shown immediately while the frame loads
+      = render partial: "company_workspaces/loading_skeleton_component"

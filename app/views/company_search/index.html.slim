@@ -10,7 +10,7 @@
                         = icon "search", library: "lucide", class: "w-10 h-10"
             .mt-2#search-results data-company-search-target="results" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 10; display: none;"
     
-    .is-flex.is-flex-direction-column style="width: 80%; margin-top: 5em;"
+    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="width: 80%; margin-top: 5em;"
         h2.title.is-4 Existing Workspaces
         - if @workspaces.any?
             .fixed-grid.has-2-cols.mt-4

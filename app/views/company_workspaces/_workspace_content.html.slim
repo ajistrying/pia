@@ -1,0 +1,60 @@
+= turbo_frame_tag "workspace-content"
+  .workspace-data.mt-4
+    .columns.is-multiline
+      
+      / Company Profile Section
+      .column.is-one-third
+        .card
+          .card-content
+            h2.title.is-5 Company Profile
+            p.content = workspace.description || "No description available"
+            .content
+              p.has-text-grey-light
+                | Symbol: #{workspace.company_symbol}
+                br
+                | Last Updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}
+      
+      / / Financial Statements Section
+      / .column.is-one-third
+      /   .card
+      /     .card-content
+      /       h2.title.is-5 Financial Statements
+      /       p.content
+      /         = pluralize(workspace.financial_statements.count, 'statement')
+      /         - if workspace.financial_statements.any?
+      /           br
+      /           small.has-text-grey
+      /             | Latest: #{workspace.financial_statements.order(period_ending: :desc).first.period_ending.strftime("%B %Y")}
+      
+      / SEC Filings Section
+      .column.is-one-third
+        .card
+          .card-content
+            h2.title.is-5 SEC Filings
+            p.content
+              = pluralize(workspace.sec_filings.count, 'filing')
+              - if workspace.sec_filings.any?
+                - workspace.sec_filings.limit(3).each do |filing|
+                  br
+                  small.has-text-grey = filing.form_type
+      
+      / Earnings Calls Section
+      .column.is-one-third
+        .card
+          .card-content
+            h2.title.is-5 Earnings Calls
+            p.content = pluralize(workspace.earnings_calls.count, 'call')
+      
+      / Key Ratios Section
+      .column.is-one-third
+        .card
+          .card-content
+            h2.title.is-5 Key Ratios
+            p.content = pluralize(workspace.key_ratios.count, 'ratio')
+      
+      / News Section
+      .column.is-one-third
+        .card
+          .card-content
+            h2.title.is-5 Recent News
+            p.content = pluralize(workspace.news_pieces.count, 'article') 

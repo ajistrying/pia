@@ -6,11 +6,13 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Defines the root path route ("/")
-  get "/", to: "company_search#index"
+  get "/", to: "company_search#index", as: :root
   get "/company_search/search", to: "company_search#search", as: :company_search_search
 
   resources :company_workspaces, only: [:destroy, :create, :show, :update, :edit] do
     member do
+      get :workspace_content
+      
       post :pull_sec_filing
       post :pull_earnings_call
       post :pull_key_ratio
