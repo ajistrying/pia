@@ -1,5 +1,7 @@
 .container
   .section
+    .mb-3
+      = link_to "← Back to Search", root_path, class: "has-text-grey is-size-7"
     h1.title.is-2 = @workspace.company_name
     
     / Subscribe to Turbo Stream updates for this workspace

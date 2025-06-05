@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_30_042318) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_05_020847) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_30_042318) do
     t.bigint "company_workspace_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "cik"
+    t.date "filing_date"
+    t.string "form_type"
+    t.string "sec_link"
+    t.string "final_link"
+    t.text "summary"
+    t.datetime "processed_at"
     t.index ["company_workspace_id"], name: "index_sec_filings_on_company_workspace_id"
   end
 

@@ -13,9 +13,9 @@
     .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="width: 80%; margin-top: 5em;"
         h2.title.is-4 Existing Workspaces
         - if @workspaces.any?
-            .fixed-grid.has-2-cols.mt-4
-                .grid
+            .columns.is-multiline.mt-4 style="width: 100%;"
                     - @workspaces.each do |workspace|
-                        = render Workspace::CardComponent.new(workspace: workspace)
+                        .column.is-half
+                            = render Workspace::CardComponent.new(workspace: workspace)
         - else
             p.has-text-grey-light No existing workspaces, start by searching for a company.

@@ -9,6 +9,5 @@ class FinancialModelingPrep::FinalizeWorkspaceInitialization
       initialized_at: Time.current,
       last_successful_update: Time.current
     )
-    # TODO: More to come here
   end
 end

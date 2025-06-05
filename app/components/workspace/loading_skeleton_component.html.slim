@@ -1,10 +1,62 @@
 .workspace-skeleton.mt-4
-    .columns.is-multiline
-        - 6.times do
-        .column.is-one-third
-            .card
-            .card-content
-                .skeleton-box.skeleton-title
-                .skeleton-box.skeleton-line
-                .skeleton-box.skeleton-line.skeleton-shorter
-                .skeleton-box.skeleton-line.skeleton-shortest
+  / Loading Status Message
+  .notification.is-primary.is-light.mb-5
+    .content
+      .is-flex.is-align-items-center
+        span.icon.mr-2
+          i.fas.fa-spinner.fa-spin
+        p.mb-0
+          strong Building workspace...
+          span.has-text-grey.ml-2 Collecting financial data and insights
+
+  / Skeleton Cards matching actual content structure
+  .columns.is-multiline
+    / Company Profile Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-shorter
+          .skeleton-box.skeleton-line.skeleton-shortest
+
+    / SEC Filings Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-short
+          .skeleton-box.skeleton-line.skeleton-short
+
+    / Earnings Calls Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-shorter
+
+    / Key Ratios/Analyst Ratings Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-short
+
+    / Recent News Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-shorter
+
+    / Financial Statements Skeleton
+    .column.is-one-third
+      .card
+        .card-content
+          .skeleton-box.skeleton-title
+          .skeleton-box.skeleton-line
+          .skeleton-box.skeleton-line.skeleton-short

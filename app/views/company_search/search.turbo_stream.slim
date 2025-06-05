@@ -14,7 +14,7 @@
                   span.mr-2 = company["symbol"]
                   span.has-text-weight-normal = company["name"]
                 div
-                  - if @existing_workspaces[[company["symbol"], company["name"]]]
+                  - if @existing_workspaces[company["symbol"]]
                     span.has-text-weight-normal Workspace already exists
                   - else
                     = button_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "button is-small is-primary", data: { turbo: false }

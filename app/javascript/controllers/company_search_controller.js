@@ -7,6 +7,7 @@ export default class extends Controller {
 	connect() {
 		this.timeout = null;
 		this.inputTarget.value = "";
+		
 		// Hide results on connect
 		if (this.hasResultsTarget) {
 			this.resultsTarget.style.display = "none";
@@ -14,8 +15,9 @@ export default class extends Controller {
 
 		// Add event listeners for closing results
 		this.handleOutsideClick = this.handleOutsideClick.bind(this);
-		this.handleEscapeKey = this.handleEscapeKey.bind(this);
 		document.addEventListener("click", this.handleOutsideClick);
+
+		this.handleEscapeKey = this.handleEscapeKey.bind(this);
 		document.addEventListener("keydown", this.handleEscapeKey);
 	}
 

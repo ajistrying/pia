@@ -14,18 +14,6 @@
                 br
                 | Last Updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}
       
-      / / Financial Statements Section
-      / .column.is-one-third
-      /   .card
-      /     .card-content
-      /       h2.title.is-5 Financial Statements
-      /       p.content
-      /         = pluralize(workspace.financial_statements.count, 'statement')
-      /         - if workspace.financial_statements.any?
-      /           br
-      /           small.has-text-grey
-      /             | Latest: #{workspace.financial_statements.order(period_ending: :desc).first.period_ending.strftime("%B %Y")}
-      
       / SEC Filings Section
       .column.is-one-third
         .card
