@@ -6,7 +6,6 @@ class FinancialModelingPrep::UpdateWorkspace
     FinancialModelingPrep::ProcessEarningsCalls,
     FinancialModelingPrep::ProcessAnalystRatings,
     FinancialModelingPrep::ProcessNews,
-    FinancialModelingPrep::ProcessCompanyProfile,
     FinancialModelingPrep::FinalizeWorkspaceUpdate,
   )
 end 

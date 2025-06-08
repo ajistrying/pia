@@ -3,6 +3,10 @@
 # Table name: earnings_calls
 #
 #  id                   :bigint           not null, primary key
+#  quarter              :string
+#  summary              :text
+#  transcript           :text
+#  year                 :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  company_workspace_id :bigint           not null

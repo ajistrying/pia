@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_05_020847) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_08_061427) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,6 +29,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_05_020847) do
     t.bigint "company_workspace_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "year"
+    t.string "quarter"
+    t.text "transcript"
+    t.text "summary"
     t.index ["company_workspace_id"], name: "index_earnings_calls_on_company_workspace_id"
   end
 

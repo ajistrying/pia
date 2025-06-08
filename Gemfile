@@ -63,6 +63,10 @@ gem "interactor", "~> 3.0"
 
 gem 'faraday'
 
+gem 'nokogiri'
+
+gem "openai", "~> 0.6.0"
+
 # HTML templating
 gem "slim"
 
@@ -70,6 +74,7 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
   gem "letter_opener"
+  gem "pry"
   gem "better_errors"
   gem "rspec-rails", "~> 7.1.1"
   gem "dotenv"

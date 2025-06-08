@@ -3,21 +3,53 @@ class FinancialModelingPrep::ProcessSecFilings < FinancialModelingPrep::BaseInte
 
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
-    from_date = 2.years.ago.beginning_of_year
+    from_date = 3.years.ago.beginning_of_year
     to_date = Date.current
-    context.url = "https://financialmodelingprep.com/stable/sec-filings-search/symbol?symbol=#{workspace.company_symbol}&from=#{from_date.strftime('%Y-%m-%d')}&to=#{to_date.strftime('%Y-%m-%d')}&page=0&limit=100"
     
-    super
+    all_filings = []
+    page = 0
+    limit = 100
     
-    # TODO: WHERE I LEFT OFF: Make sure the response is an array of hashes that can be processed by process_filings
-    process_filings(context.response, workspace)
+    # Paginate through all results
+    loop do
+      context.url = "https://financialmodelingprep.com/stable/sec-filings-search/symbol?symbol=#{workspace.company_symbol}&from=#{from_date.strftime('%Y-%m-%d')}&to=#{to_date.strftime('%Y-%m-%d')}&page=#{page}&limit=#{limit}"
+      
+      super
+      
+      current_page_filings = context.response_result
+      
+      # Break if no more results
+      break if current_page_filings.nil? || current_page_filings.empty?
+      
+      all_filings.concat(current_page_filings)
+      
+      # Break if we got less than the limit (last page)
+      break if current_page_filings.length < limit
+      
+      page += 1
+      
+      # Safety break to prevent infinite loops
+      break if page > 50  # Reasonable upper limit
+      
+      # Be respectful to the API
+      sleep 0.2
+    end
+    
+    Rails.logger.info "Fetched #{all_filings.length} SEC filings across #{page + 1} pages for #{workspace.company_symbol}"
+    
+    process_filings(all_filings, workspace)
   end
 
   private
 
   def process_filings(filings, workspace)
-    filings.each do |filing|
-      # Store basic filing metadata
+    # Filter to only important filings before storing anything
+    important_filings = filings.select { |filing| important_filing?(filing['formType']) }
+    
+    Rails.logger.info "Processing #{important_filings.length} important filings out of #{filings.length} total for #{workspace.company_symbol}"
+    
+    important_filings.each do |filing|
+      # Store only important filing metadata
       sec_filing = SecFiling.create!(
         company_workspace: workspace,
         cik: filing['cik'],
@@ -27,25 +59,25 @@ class FinancialModelingPrep::ProcessSecFilings < FinancialModelingPrep::BaseInte
         final_link: filing['finalLink'],
       )
 
-      # Process important filings with LLM
-      if important_filing?(filing['formType'])
-        generate_important_filing_summary(sec_filing)
-      end
+      # Generate summary immediately since we know it's important
+      generate_important_filing_summary(sec_filing)
     end
   end
 
   def important_filing?(form_type)
-    %w[10-K 10-Q 8-K].include?(form_type)
+    ['10-K', '10-Q', '8-K', 'DEF 14A'].include?(form_type)
   end
 
   def generate_important_filing_summary(sec_filing)
     # Fetch the filing content
     filing_content = fetch_filing_content(sec_filing.final_link)
+
+    return unless filing_content
     
-    # Generate summary using LLM
     summary = generate_filing_summary(filing_content, sec_filing.form_type)
-    
-    # Store the summary
+
+    return unless summary
+        
     sec_filing.update!(
       summary:,
       processed_at: Time.current
@@ -53,24 +85,268 @@ class FinancialModelingPrep::ProcessSecFilings < FinancialModelingPrep::BaseInte
   end
 
   def fetch_filing_content(url)
-    # Implement fetching logic here
-    # You might want to use a service like SEC's EDGAR API
-    # or parse the HTML/XML content from the final_link
+    sleep 0.5
+    
+    response = Faraday.new do |faraday|
+      faraday.headers['User-Agent'] = 'YourCompany Pia/1.0 (wjohnson@eleudev.com)'
+      faraday.options.timeout = 30
+      faraday.options.open_timeout = 10
+    end.get(url)
+
+    unless response.success?
+      Rails.logger.error "Error fetching SEC filing #{url}: #{response.status}"
+      return nil
+    end
+
+    doc = Nokogiri::HTML(response.body)
+    doc.css('script, style, nav, header, footer').remove
+    
+    doc.text
+      .gsub(/\s+/, ' ')           # Normalize whitespace
+      .gsub(/\n+/, "\n")          # Clean up line breaks
+      .strip
+
+  rescue Faraday::TimeoutError => e
+    Rails.logger.warn "SEC filing fetch timeout: #{url}"
+    nil
+  rescue => e
+    Rails.logger.error "Error fetching SEC filing #{url}: #{e.message}"
+    nil
   end
 
   def generate_filing_summary(content, form_type)
-    # Use your preferred LLM to generate a summary
-    # Different prompts for different form types
-    case form_type
+    # Create comprehensive prompts based on filing type
+    prompt = case form_type
     when '10-K'
-      prompt = "Summarize this annual report, focusing on key financial metrics, risks, and business strategy..."
+      build_10k_prompt
     when '10-Q'
-      prompt = "Summarize this quarterly report, focusing on recent performance and significant changes..."
+      build_10q_prompt
     when '8-K'
-      prompt = "Summarize this current report, focusing on the material event and its implications..."
+      build_8k_prompt
+    when 'DEF 14A'
+      build_def14a_prompt
+    else
+      "Provide a comprehensive investment-focused summary of this SEC filing."
     end
-    
-    # Call your LLM service here
-    # return llm_service.generate_summary(content, prompt)
+
+    # Call OpenAI API with correct format for v0.6.0
+    begin
+      client = OpenAI::Client.new(api_key: ENV['OPENAI_API_KEY'])
+      response = client.chat.completions.create(
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: prompt },
+          { role: "user", content: content }
+        ],
+        max_tokens: 2000,
+        temperature: 0.3
+      )
+      
+      response.choices.first.message.content
+      
+    rescue => e
+      Rails.logger.error "OpenAI API error: #{e.message}"
+      nil
+    end
+  end
+
+  private
+
+  def build_10k_prompt
+    <<~PROMPT
+      You are an expert financial analyst. Analyze this 10-K annual report and provide a comprehensive investment summary. Focus on:
+
+      **FINANCIAL PERFORMANCE & METRICS:**
+      - Revenue trends, growth rates, and seasonality patterns
+      - Profitability metrics (gross, operating, net margins)
+      - Key financial ratios (ROE, ROA, debt-to-equity, current ratio)
+      - Cash flow analysis (operating, investing, financing)
+      - Capital allocation strategy (dividends, buybacks, reinvestment)
+
+      **BUSINESS STRATEGY & COMPETITIVE POSITION:**
+      - Core business segments and revenue contributions
+      - Competitive advantages and moats
+      - Market position and market share trends
+      - Strategic initiatives and growth investments
+      - R&D spending and innovation pipeline
+
+      **RISK FACTORS & CONCERNS:**
+      - Top 5 most material business risks
+      - Regulatory risks and compliance issues
+      - Market/economic sensitivity
+      - Operational risks and dependencies
+      - Financial risks (liquidity, credit, interest rate)
+
+      **MANAGEMENT OUTLOOK & GUIDANCE:**
+      - Forward-looking statements and guidance
+      - Capital expenditure plans
+      - Market expansion plans
+      - Expected headwinds and tailwinds
+
+      **INVESTMENT THESIS IMPLICATIONS:**
+      - Long-term growth prospects (3-5 years)
+      - Dividend sustainability and growth potential
+      - Valuation considerations vs peers
+      - Key catalysts to monitor
+      - Red flags or concerns for investors
+
+      Format your response with clear sections and bullet points. Be objective and highlight both opportunities and risks.
+    PROMPT
+  end
+
+  def build_10q_prompt
+    <<~PROMPT
+      You are an expert financial analyst. Analyze this 10-Q quarterly report and provide a comprehensive investment summary. Focus on:
+
+      **QUARTERLY PERFORMANCE:**
+      - Revenue performance vs prior quarter and year-over-year
+      - Margin trends (gross, operating, net) and drivers
+      - Earnings quality and one-time items
+      - Segment performance and geographic breakdown
+      - Sequential trends and seasonality factors
+
+      **FINANCIAL POSITION CHANGES:**
+      - Balance sheet changes from prior quarter
+      - Cash position and debt levels
+      - Working capital trends
+      - Capital expenditures and investments
+      - Share count changes (buybacks, dilution)
+
+      **BUSINESS DEVELOPMENTS:**
+      - Operational highlights and achievements
+      - New product launches or service offerings
+      - Market share gains/losses
+      - Strategic partnerships or acquisitions
+      - Management commentary on business trends
+
+      **FORWARD-LOOKING INDICATORS:**
+      - Updated guidance or outlook statements
+      - Management commentary on future quarters
+      - Order backlog or pipeline changes
+      - Seasonal expectations
+      - Macro environment impact
+
+      **INVESTMENT IMPLICATIONS:**
+      - Progress toward annual goals
+      - Trend sustainability analysis
+      - Relative performance vs competitors
+      - Key metrics to watch next quarter
+      - Potential surprises or catalysts
+
+      **RISKS & CONCERNS:**
+      - Near-term headwinds
+      - Margin pressure sources
+      - Market or competitive challenges
+      - Operational issues
+
+      Format your response with clear sections and bullet points. Focus on changes from previous periods and forward-looking trends.
+    PROMPT
+  end
+
+  def build_8k_prompt
+    <<~PROMPT
+      You are an expert financial analyst. Analyze this 8-K current report and provide a comprehensive investment summary. Focus on:
+
+      **MATERIAL EVENT ANALYSIS:**
+      - Specific event or announcement details
+      - Immediate financial impact (if quantified)
+      - Strategic significance for the business
+      - Timeline and implementation details
+      - Comparison to market expectations
+
+      **INVESTMENT IMPACT ASSESSMENT:**
+      - Short-term stock price implications
+      - Long-term strategic value creation/destruction
+      - Impact on competitive position
+      - Financial model adjustments needed
+      - Valuation multiple implications
+
+      **STAKEHOLDER IMPLICATIONS:**
+      - Impact on shareholders (dilution, returns)
+      - Creditor impact (debt capacity, covenants)
+      - Customer/supplier relationships
+      - Employee impact (layoffs, hiring, compensation)
+      - Regulatory implications
+
+      **RISK ASSESSMENT:**
+      - Execution risks for the announced event
+      - Market reaction risks
+      - Integration risks (for M&A)
+      - Regulatory approval risks
+      - Opportunity costs
+
+      **CONTEXT & COMPARISONS:**
+      - How this fits company's strategic plan
+      - Historical precedent for similar events
+      - Peer company comparisons
+      - Market/industry context
+      - Management track record on similar initiatives
+
+      **INVESTMENT DECISION FACTORS:**
+      - Key questions for management
+      - Metrics to monitor post-announcement
+      - Timeframe for benefits/impact
+      - Contingency scenarios
+      - Buy/sell/hold implications
+
+      Format your response with clear sections and bullet points. Be specific about the investment implications and what investors should monitor.
+    PROMPT
+  end
+
+  def build_def14a_prompt
+    <<~PROMPT
+      You are an expert financial analyst. Analyze this DEF 14A proxy statement and provide a comprehensive investment summary. Focus on:
+
+      **CORPORATE GOVERNANCE:**
+      - Board composition and independence
+      - Director qualifications and experience
+      - Board diversity and tenure
+      - Committee structure and effectiveness
+      - Governance best practices and concerns
+
+      **EXECUTIVE COMPENSATION:**
+      - CEO and executive pay levels vs performance
+      - Pay-for-performance alignment
+      - Compensation structure (base, bonus, equity)
+      - Peer group comparisons
+      - Say-on-pay voting history and concerns
+
+      **SHAREHOLDER PROPOSALS:**
+      - Management proposals and rationale
+      - Shareholder-initiated proposals
+      - Board recommendations and reasoning
+      - Voting implications for shareholders
+      - Activist investor involvement
+
+      **MANAGEMENT ACCOUNTABILITY:**
+      - Executive performance metrics
+      - Long-term incentive plan design
+      - Clawback provisions and risk management
+      - Succession planning transparency
+      - Historical pay vs performance correlation
+
+      **INVESTMENT GOVERNANCE IMPLICATIONS:**
+      - Capital allocation oversight
+      - Strategic decision-making process
+      - Risk management framework
+      - Shareholder rights and protections
+      - ESG (Environmental, Social, Governance) initiatives
+
+      **VOTING RECOMMENDATIONS:**
+      - Key proposals requiring shareholder vote
+      - Investment thesis alignment with proposals
+      - Potential conflicts of interest
+      - Long-term value creation considerations
+      - Activist campaign assessment (if applicable)
+
+      **RED FLAGS & POSITIVE INDICATORS:**
+      - Governance best practices
+      - Compensation red flags
+      - Board effectiveness indicators
+      - Shareholder-friendly policies
+      - Transparency and disclosure quality
+
+      Format your response with clear sections and bullet points. Focus on governance quality and long-term value creation alignment.
+    PROMPT
   end
 end
