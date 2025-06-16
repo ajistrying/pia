@@ -3,6 +3,12 @@
 # Table name: news_pieces
 #
 #  id                   :bigint           not null, primary key
+#  author               :string
+#  content              :text
+#  published_date       :datetime
+#  summary              :text
+#  title                :string
+#  url                  :string
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  company_workspace_id :bigint           not null

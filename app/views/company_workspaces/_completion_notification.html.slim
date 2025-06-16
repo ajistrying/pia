@@ -1,0 +1,17 @@
+/ Completion notification
+#progress-indicator.mb-4
+  .notification.is-success.is-light data-controller="notification"
+    button.delete data-action="click->notification#delete"
+    .content
+      .level
+        .level-left
+          .level-item
+            span.icon.is-large.has-text-success
+              | ✅
+        .level-item
+          .content
+            h5.title.is-6.has-text-success.mb-1 Update Complete!
+            p.subtitle.is-7.has-text-grey-dark 
+              | #{workspace.company_name} data has been successfully updated
+            p.is-size-7.has-text-grey
+              | Last updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}

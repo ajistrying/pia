@@ -1,0 +1,26 @@
+# Sidekiq configuration
+:concurrency: 5
+
+# Queue configuration - higher priority queues are processed first
+:queues:
+  - [critical, 3]           # User-facing updates, highest priority
+  - [workspace_updates, 2]  # Workspace orchestration
+  - [data_processing, 4]    # API calls and data fetching (most jobs)
+  - [ai_processing, 2]      # OpenAI API calls
+  - [default, 1]           # Everything else
+
+# Retry configuration
+:retry: 3
+
+# Development and production can have different settings
+:development:
+  :concurrency: 3
+
+:production:
+  :concurrency: 10
+  :queues:
+    - [critical, 5]
+    - [workspace_updates, 3]
+    - [data_processing, 8]
+    - [ai_processing, 4]
+    - [default, 2]

@@ -1,0 +1,36 @@
+/ Analyst Ratings Section
+#analyst-ratings-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 🎯
+        | Analyst Ratings
+        .tag.is-info.is-light.ml-2
+          = workspace.analyst_ratings.count
+    .card-content
+      - if workspace.analyst_ratings.any?
+        .content
+          - recent_ratings = workspace.analyst_ratings.order(created_date: :desc).limit(5)
+          - recent_ratings.each do |rating|
+            .box.p-3.mb-2
+              .level.is-mobile
+                .level-left
+                  .level-item
+                    .content
+                      p.has-text-weight-semibold.mb-1 = rating.rating_agency
+                      p.is-size-7.has-text-grey = rating.created_date&.strftime("%B %d, %Y")
+                .level-right
+                  .level-item
+                    .content.has-text-right
+                      - if rating.rating.present?
+                        span.tag.is-info = rating.rating
+                      - if rating.price_target.present?
+                        p.is-size-7.has-text-weight-semibold.mt-1
+                          | Target: #{number_to_currency(rating.price_target, precision: 0)}
+              - if rating.notes.present?
+                .content.mt-2
+                  p.is-size-7 = truncate(rating.notes, length: 150)
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No analyst ratings available yet

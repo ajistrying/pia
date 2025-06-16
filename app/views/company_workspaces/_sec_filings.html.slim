@@ -1,0 +1,37 @@
+/ SEC Filings Section
+#sec-filings-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 📄
+        | SEC Filings
+        .tag.is-info.is-light.ml-2
+          = workspace.sec_filings.count
+    .card-content
+      - if workspace.sec_filings.any?
+        .content
+          - workspace.sec_filings.order(filing_date: :desc).limit(5).each do |filing|
+            .box.p-3.mb-2
+              .level.is-mobile
+                .level-left
+                  .level-item
+                    .content
+                      p.has-text-weight-semibold.mb-1 = filing.form_type
+                      p.is-size-7.has-text-grey = filing.filing_date.strftime("%B %d, %Y")
+                .level-right
+                  .level-item
+                    - if filing.summary.present?
+                      span.tag.is-success.is-small ✓ Analyzed
+                    - else
+                      span.tag.is-warning.is-small ⏳ Processing
+              - if filing.summary.present?
+                .content.mt-2
+                  p.is-size-7 = truncate(filing.summary, length: 200)
+          - if workspace.sec_filings.count > 5
+            .has-text-centered.mt-3
+              p.is-size-7.has-text-grey
+                | + #{workspace.sec_filings.count - 5} more filings
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No SEC filings available yet

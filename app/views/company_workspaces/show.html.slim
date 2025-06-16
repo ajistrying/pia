@@ -2,10 +2,12 @@
   .section
     .mb-3
       = link_to "← Back to Search", root_path, class: "has-text-grey is-size-7"
-    h1.title.is-2 = @workspace.company_name
     
     / Subscribe to Turbo Stream updates for this workspace
     = turbo_stream_from "workspace_#{@workspace.id}"
+    
+    / Progress indicator will appear here during updates
+    #progress-indicator
     
     / Turbo Frame with lazy loading
     = turbo_frame_tag "workspace-content", src: workspace_content_company_workspace_path(@workspace), loading: :lazy do

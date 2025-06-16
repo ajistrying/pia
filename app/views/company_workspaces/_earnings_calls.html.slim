@@ -1,0 +1,34 @@
+/ Earnings Calls Section
+#earnings-calls-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 📞
+        | Earnings Calls
+        .tag.is-info.is-light.ml-2
+          = workspace.earnings_calls.count
+    .card-content
+      - if workspace.earnings_calls.any?
+        .content
+          - workspace.earnings_calls.order(year: :desc, quarter: :desc).limit(4).each do |call|
+            .box.p-3.mb-2
+              .level.is-mobile
+                .level-left
+                  .level-item
+                    .content
+                      p.has-text-weight-semibold.mb-1 Q#{call.quarter} #{call.year}
+                      - if call.summary.present?
+                        span.tag.is-success.is-small ✓ Analyzed
+                      - else
+                        span.tag.is-warning.is-small ⏳ Processing
+              - if call.summary.present?
+                .content.mt-2
+                  p.is-size-7 = truncate(call.summary, length: 200)
+          - if workspace.earnings_calls.count > 4
+            .has-text-centered.mt-3
+              p.is-size-7.has-text-grey
+                | + #{workspace.earnings_calls.count - 4} more calls
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No earnings calls available yet

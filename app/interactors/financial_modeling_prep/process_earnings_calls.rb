@@ -1,4 +1,4 @@
-class FinancialModelingPrep::ProcessEarningsCalls
+class FinancialModelingPrep::ProcessEarningsCalls < FinancialModelingPrep::BaseInteractor
   include Interactor
 
   def call
@@ -10,11 +10,15 @@ class FinancialModelingPrep::ProcessEarningsCalls
 
     (start_year..end_year).each do |year|
       (start_quarter..end_quarter).each do |quarter|
-        context.url = "https://financialmodelingprep.com/stable/earning-call-transcript?symbol=#{workspace.company_symbol}&year=#{year}&quarter=#{quarter}"
+        url = "https://financialmodelingprep.com/stable/earning-call-transcript?symbol=#{workspace.company_symbol}&year=#{year}&quarter=#{quarter}"
 
-        super
+        # Call API directly for each quarter
+        response = Faraday.get("#{url}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
+        response_result = JSON.parse(response.body)
 
-        context.response_result.each do |earnings_call|
+        next if response_result.nil? || response_result.empty?
+
+        response_result.each do |earnings_call|
           EarningsCall.create!(
             company_workspace: workspace,
             year: year,

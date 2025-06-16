@@ -1,0 +1,41 @@
+/ Financial Statements Section
+#financial-statements-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 📊
+        | Financial Statements
+        .tag.is-info.is-light.ml-2
+          = workspace.financial_statements.count
+    .card-content
+      - if workspace.financial_statements.any?
+        .tabs.is-small.is-boxed
+          ul
+            li.is-active
+              a Income Statement
+            li
+              a Balance Sheet  
+            li
+              a Cash Flow
+        .content
+          - workspace.financial_statements.where(statement_type: 'income_statement').order(year: :desc).limit(3).each do |statement|
+            .box.p-3.mb-2
+              .level.is-mobile
+                .level-left
+                  .level-item
+                    .content
+                      p.has-text-weight-semibold.mb-1 = statement.year
+                      p.is-size-7.has-text-grey = statement.period
+                .level-right
+                  .level-item
+                    .content.has-text-right
+                      - if statement.revenue.present?
+                        p.is-size-7.has-text-weight-semibold
+                          | Revenue: #{number_to_currency(statement.revenue, precision: 0)}
+                      - if statement.net_income.present?
+                        p.is-size-7
+                          | Net Income: #{number_to_currency(statement.net_income, precision: 0)}
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No financial statements available yet

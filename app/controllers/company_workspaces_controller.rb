@@ -38,7 +38,7 @@ class CompanyWorkspacesController < ApplicationController
     if @workspace.initialized_at.nil?
       InitializeWorkspaceJob.perform_later(@workspace.id)
     else
-      UpdateWorkspaceJob.perform_later(@workspace.id)
+      ParallelWorkspaceUpdateJob.perform_later(@workspace.id)
     end
   end
 end

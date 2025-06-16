@@ -1,0 +1,44 @@
+/ News Section
+#news-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 📰
+        | Recent News
+        .tag.is-info.is-light.ml-2
+          = workspace.news_pieces.count
+    .card-content
+      - if workspace.news_pieces.any?
+        .content
+          - workspace.news_pieces.order(published_date: :desc).limit(5).each do |news|
+            .box.p-3.mb-2
+              .level.is-mobile
+                .level-left
+                  .level-item
+                    .content
+                      p.has-text-weight-semibold.mb-1 
+                        - if news.url.present?
+                          = link_to truncate(news.title, length: 60), news.url, target: "_blank", class: "has-text-dark"
+                        - else
+                          = truncate(news.title, length: 60)
+                      p.is-size-7.has-text-grey 
+                        = news.published_date&.strftime("%B %d, %Y")
+                        - if news.author.present?
+                          |  • #{news.author}
+                .level-right
+                  .level-item
+                    - if news.summary.present?
+                      span.tag.is-success.is-small ✓ Analyzed
+                    - else
+                      span.tag.is-warning.is-small ⏳ Processing
+              - if news.summary.present?
+                .content.mt-2
+                  p.is-size-7 = truncate(news.summary, length: 200)
+          - if workspace.news_pieces.count > 5
+            .has-text-centered.mt-3
+              p.is-size-7.has-text-grey
+                | + #{workspace.news_pieces.count - 5} more articles
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No news articles available yet

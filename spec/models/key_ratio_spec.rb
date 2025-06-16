@@ -3,6 +3,12 @@
 # Table name: key_ratios
 #
 #  id                   :bigint           not null, primary key
+#  period               :string
+#  quarter              :integer
+#  ratio_name           :string
+#  ratio_value          :decimal(, )
+#  ttm                  :boolean
+#  year                 :integer
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  company_workspace_id :bigint           not null

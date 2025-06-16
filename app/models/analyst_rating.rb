@@ -1,26 +1,27 @@
 # == Schema Information
 #
-# Table name: key_ratios
+# Table name: analyst_ratings
 #
 #  id                   :bigint           not null, primary key
-#  period               :string
-#  quarter              :integer
-#  ratio_name           :string
-#  ratio_value          :decimal(, )
-#  ttm                  :boolean
-#  year                 :integer
+#  analyst_name         :string
+#  created_date         :date
+#  notes                :text
+#  price_target         :decimal(, )
+#  rating               :string
+#  rating_agency        :string
+#  target_date          :date
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  company_workspace_id :bigint           not null
 #
 # Indexes
 #
-#  index_key_ratios_on_company_workspace_id  (company_workspace_id)
+#  index_analyst_ratings_on_company_workspace_id  (company_workspace_id)
 #
 # Foreign Keys
 #
 #  fk_rails_...  (company_workspace_id => company_workspaces.id)
 #
-class KeyRatio < ApplicationRecord
+class AnalystRating < ApplicationRecord
   belongs_to :company_workspace
 end

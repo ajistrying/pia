@@ -8,6 +8,9 @@
 #  description            :text
 #  initialized_at         :datetime
 #  last_successful_update :datetime
+#  last_update_started_at :datetime
+#  processing_status      :string
+#  progress_percentage    :integer
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #

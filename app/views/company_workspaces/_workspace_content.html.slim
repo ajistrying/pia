@@ -1,48 +1,44 @@
 = turbo_frame_tag "workspace-content"
-  .workspace-data.mt-4
+  / Progress indicator (will be replaced when processing starts)
+  #progress-indicator
+  
+  / Company Overview
+  .hero.is-light.mb-5
+    .hero-body.py-4
+      .container
+        .level
+          .level-left
+            .level-item
+              .content
+                h1.title.is-4.mb-1 = workspace.company_name
+                p.subtitle.is-6.has-text-grey-dark Symbol: #{workspace.company_symbol}
+          .level-right
+            .level-item
+              .content.has-text-right
+                - if workspace.last_successful_update.present?
+                  p.is-size-7.has-text-grey
+                    | Last Updated: #{workspace.last_successful_update.strftime("%b %d, %Y at %I:%M %p")}
+                - if workspace.processing_status == 'completed'
+                  span.tag.is-success ✓ Up to date
+                - elsif workspace.last_update_started_at.present?
+                  span.tag.is-warning ⏳ Updating
+                - else
+                  span.tag.is-light Initialized
+
+  / Financial Data Sections
+  .workspace-data
     .columns.is-multiline
-      
-      / Company Profile Section
-      .column.is-one-third
-        .card
-          .card-content
-            h2.title.is-5 Company Profile
-            p.content = workspace.description || "No description available"
-            .content
-              p.has-text-grey-light
-                | Symbol: #{workspace.company_symbol}
-                br
-                | Last Updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}
-      
-      / SEC Filings Section
-      .column.is-one-third
-        .card
-          .card-content
-            h2.title.is-5 SEC Filings
-            p.content
-              = pluralize(workspace.sec_filings.count, 'filing')
-              - if workspace.sec_filings.any?
-                - workspace.sec_filings.limit(3).each do |filing|
-                  br
-                  small.has-text-grey = filing.form_type
-      
-      / Earnings Calls Section
-      .column.is-one-third
-        .card
-          .card-content
-            h2.title.is-5 Earnings Calls
-            p.content = pluralize(workspace.earnings_calls.count, 'call')
-      
-      / Key Ratios Section
-      .column.is-one-third
-        .card
-          .card-content
-            h2.title.is-5 Key Ratios
-            p.content = pluralize(workspace.key_ratios.count, 'ratio')
-      
-      / News Section
-      .column.is-one-third
-        .card
-          .card-content
-            h2.title.is-5 Recent News
-            p.content = pluralize(workspace.news_pieces.count, 'article') 
+      .column.is-half
+        = render partial: "company_workspaces/sec_filings", locals: { workspace: workspace }
+      .column.is-half  
+        = render partial: "company_workspaces/earnings_calls", locals: { workspace: workspace }
+      .column.is-half
+        = render partial: "company_workspaces/financial_statements", locals: { workspace: workspace }
+      .column.is-half
+        = render partial: "company_workspaces/key_ratios", locals: { workspace: workspace }
+      .column.is-half
+        = render partial: "company_workspaces/enterprise_value", locals: { workspace: workspace }
+      .column.is-half
+        = render partial: "company_workspaces/analyst_ratings", locals: { workspace: workspace }
+      .column.is-full
+        = render partial: "company_workspaces/news", locals: { workspace: workspace } 

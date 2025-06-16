@@ -1,21 +1,22 @@
 # == Schema Information
 #
-# Table name: news_pieces
+# Table name: analyst_ratings
 #
 #  id                   :bigint           not null, primary key
-#  author               :string
-#  content              :text
-#  published_date       :datetime
-#  summary              :text
-#  title                :string
-#  url                  :string
+#  analyst_name         :string
+#  created_date         :date
+#  notes                :text
+#  price_target         :decimal(, )
+#  rating               :string
+#  rating_agency        :string
+#  target_date          :date
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  company_workspace_id :bigint           not null
 #
 # Indexes
 #
-#  index_news_pieces_on_company_workspace_id  (company_workspace_id)
+#  index_analyst_ratings_on_company_workspace_id  (company_workspace_id)
 #
 # Foreign Keys
 #
@@ -23,6 +24,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe NewsPiece, type: :model do
+RSpec.describe AnalystRating, type: :model do
   pending "add some examples to (or delete) #{__FILE__}"
 end

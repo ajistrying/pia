@@ -1,0 +1,35 @@
+/ Progress indicator for workspace updates
+#progress-indicator.mb-4
+  .card.has-background-info-light
+    .card-content
+      .level
+        .level-left
+          .level-item
+            .content
+              h5.title.is-6.has-text-info.mb-1 Updating #{workspace.company_name}
+              p.subtitle.is-7.has-text-grey-dark Gathering financial data...
+        .level-right
+          .level-item
+            .content.has-text-right
+              p.has-text-weight-bold.has-text-info #{completed_tasks}/#{total_tasks} completed
+              
+      / Progress bar
+      .progress-container.mb-3
+        progress.progress.is-info.is-medium value="#{progress}" max="100"
+          | #{progress}%
+          
+      / Task status indicators
+      .columns.is-mobile.is-multiline.is-variable.is-1
+        - WorkspaceUpdateTracker::TASK_TYPES.each do |task_type|
+          - is_completed = workspace_task_completed?(workspace.id, task_type)
+          .column.is-narrow
+            .tag class="#{is_completed ? 'is-success' : 'is-light'}"
+              span.icon.is-small
+                = is_completed ? "✓" : "○"
+              span = task_type.humanize
+              
+      / Estimated time remaining (optional)
+      - if progress > 0 && progress < 100
+        .has-text-centered.mt-2
+          p.is-size-7.has-text-grey-dark
+            | Processing... This may take a few minutes

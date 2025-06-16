@@ -1,0 +1,29 @@
+/ Enterprise Value Section
+#enterprise-value-section
+  .card.mb-4
+    .card-header
+      .card-header-title
+        span.icon.mr-2
+          | 💰
+        | Valuation Metrics
+    .card-content
+      - ev_ratios = workspace.key_ratios.where("ratio_name ILIKE ?", "%enterprise%").or(workspace.key_ratios.where("ratio_name ILIKE ?", "%market%"))
+      - if ev_ratios.any?
+        .content
+          .columns.is-multiline
+            - ev_ratios.limit(6).each do |ratio|
+              .column.is-half
+                .level.is-mobile
+                  .level-left
+                    .level-item
+                      p.is-size-7 = ratio.ratio_name
+                  .level-right
+                    .level-item
+                      p.is-size-7.has-text-weight-semibold
+                        - if ratio.ratio_name.include?("Value") || ratio.ratio_name.include?("Market")
+                          = number_to_currency(ratio.ratio_value, precision: 0)
+                        - else
+                          = ratio.ratio_value&.round(2)
+      - else
+        .content.has-text-grey.has-text-centered.p-4
+          p No valuation metrics available yet
