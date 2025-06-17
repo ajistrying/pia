@@ -1,0 +1,29 @@
+= turbo_frame_tag :remote_modal do
+  dialog.fixed.inset-0.m-auto.p-0.w-11/12.max-w-3xl.bg-white.rounded-lg.shadow-lg.backdrop:bg-gray-600.backdrop:bg-opacity-50 data-controller="remote-modal" data-action="click->remote-modal#backdropClick" aria-labelledby="modal_title"
+    .p-6
+      / Modal Header
+      .flex.justify-between.items-center.mb-4
+        h2#modal_title.text-xl.font-bold.text-gray-900
+          | Analysis in Progress
+        form method="dialog"
+          button.text-gray-400.bg-transparent.hover:bg-gray-200.hover:text-gray-900.rounded-lg.text-sm.p-1.5 type="submit" aria-label="Close"
+            svg.w-5.h-5 fill="currentColor" viewBox="0 0 20 20"
+              path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"
+      
+      / Modal Body
+      .text-center.space-y-4.py-8
+        .w-16.h-16.bg-amber-100.rounded-full.flex.items-center.justify-center.mx-auto
+          svg.w-8.h-8.text-amber-500.animate-spin[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+            path[d="M21 12a9 9 0 11-6.219-8.56"]
+        .space-y-2
+          h4.text-lg.font-semibold.text-gray-900 Processing Article
+          p.text-gray-600 Our AI is analyzing this news article for key insights and market sentiment. This typically takes a few minutes.
+        
+        .text-sm.text-gray-500
+          | Please check back shortly for the complete analysis.
+      
+      / Modal Footer
+      .flex.justify-end.mt-6
+        form method="dialog"
+          button.px-4.py-2.bg-gray-300.text-gray-700.rounded-lg.hover:bg-gray-400.transition-colors type="submit"
+            | Close 

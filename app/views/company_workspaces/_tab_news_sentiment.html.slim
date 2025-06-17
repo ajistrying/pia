@@ -1,44 +1,167 @@
-/ News Section
-#news-section
-  .card.mb-4
-    .card-header
-      .card-header-title
-        span.icon.mr-2
-          | 📰
-        | Recent News
-        .tag.is-info.is-light.ml-2
-          = workspace.news_pieces.count
-    .card-content
-      - if workspace.news_pieces.any?
-        .content
-          - workspace.news_pieces.order(published_date: :desc).limit(5).each do |news|
-            .box.p-3.mb-2
-              .level.is-mobile
-                .level-left
-                  .level-item
-                    .content
-                      p.has-text-weight-semibold.mb-1 
-                        - if news.url.present?
-                          = link_to truncate(news.title, length: 60), news.url, target: "_blank", class: "has-text-dark"
-                        - else
-                          = truncate(news.title, length: 60)
-                      p.is-size-7.has-text-grey 
-                        = news.published_date&.strftime("%B %d, %Y")
+/ Enhanced News & Sentiment Section
+#news-section.space-y-6
+  / Header with stats and filters
+  .bg-gradient-to-r.from-blue-50.to-indigo-50.rounded-2xl.p-6.border.border-blue-100
+    .flex.items-center.justify-between.mb-4
+      .flex.items-center.space-x-4
+        .flex.items-center.justify-center.w-16.h-16.bg-blue-100.rounded-full
+          svg.w-8.h-8.text-blue-600[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+            path[d="M12 19l7-7 3 3-7 7-3-3z"]
+            path[d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"]
+            path[d="M2 2l7.586 7.586"]
+            circle[cx="11" cy="11" r="2"]
+        .space-y-1
+          h2.text-2xl.font-bold.text-gray-900 News & Market Sentiment
+          p.text-gray-600 Latest market news and AI-powered sentiment analysis
+      
+      .flex.items-center.space-x-4
+        .text-center
+          .text-2xl.font-bold.text-blue-600 = workspace.news_pieces.count
+          .text-sm.text-gray-500 Total Articles
+        .text-center
+          .text-2xl.font-bold.text-green-600 
+            = workspace.news_pieces.where.not(summary: [nil, '']).count
+          .text-sm.text-gray-500 Analyzed
+        .text-center
+          .text-2xl.font-bold.text-amber-600 
+            = workspace.news_pieces.where(summary: [nil, '']).count
+          .text-sm.text-gray-500 Processing
+
+    / Quick stats bar
+    - if workspace.news_pieces.any?
+      - latest_news = workspace.news_pieces.order(published_date: :desc).first
+      .grid.grid-cols-3.gap-4.mt-4
+        .text-center.p-3.bg-white.rounded-lg.shadow-sm
+          .text-sm.text-gray-500 Latest News
+          .text-lg.font-semibold.text-gray-900 
+            = latest_news.published_date&.strftime("%b %d") || "Today"
+        .text-center.p-3.bg-white.rounded-lg.shadow-sm
+          .text-sm.text-gray-500 This Week
+          .text-lg.font-semibold.text-gray-900 
+            = workspace.news_pieces.where(published_date: 1.week.ago..).count
+        .text-center.p-3.bg-white.rounded-lg.shadow-sm
+          .text-sm.text-gray-500 Coverage
+          .text-lg.font-semibold.text-gray-900 Daily
+
+  / News Timeline
+  - if workspace.news_pieces.any?
+    .space-y-1
+      / Timeline Header
+      .flex.items-center.space-x-2.mb-6
+        .h-px.bg-gradient-to-r.from-transparent.via-gray-300.to-transparent.flex-1
+        .px-4.py-2.bg-gray-100.rounded-full.text-sm.font-medium.text-gray-600 Recent Articles
+        .h-px.bg-gradient-to-r.from-transparent.via-gray-300.to-transparent.flex-1
+      
+      / News Articles with Timeline
+      .space-y-4
+        - workspace.news_pieces.order(published_date: :desc).limit(10).each_with_index do |news, index|
+          .group.relative
+            / Timeline connector
+            - unless index == workspace.news_pieces.count - 1
+              .absolute.left-8.top-20.w-0.5.h-full.bg-gradient-to-b.from-gray-300.to-transparent.z-0
+            
+            / Article Card
+            .relative.bg-white.rounded-xl.shadow-sm.border.border-gray-200.hover:shadow-lg.transition-all.duration-300.hover:border-blue-200
+              / Timeline dot
+              .absolute.-left-2.top-6.w-4.h-4.bg-blue-500.rounded-full.border-2.border-white.shadow-md.z-10.group-hover:bg-blue-600.transition-colors
+              
+              .p-6
+                .flex.items-start.justify-between.space-x-4
+                  .flex-1.space-y-3
+                    / Article header
+                    .space-y-2
+                      .flex.items-center.space-x-2.text-sm.text-gray-500
+                        svg.w-4.h-4[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                          circle[cx="12" cy="12" r="10"]
+                          polyline[points="12,6 12,12 16,14"]
+                        span = news.published_date&.strftime("%B %d, %Y at %I:%M %p") || "Date unknown"
                         - if news.author.present?
-                          |  • #{news.author}
-                .level-right
-                  .level-item
+                          span.text-gray-300 •
+                          span.font-medium = news.author
+                      
+                      / Article title
+                      h3.text-lg.font-bold.text-gray-900.leading-tight.group-hover:text-blue-600.transition-colors
+                        - if news.url.present?
+                          = link_to news.url, target: "_blank", class: "hover:underline"
+                            = news.title || "Untitled Article"
+                            svg.inline.w-4.h-4.ml-1.opacity-0.group-hover:opacity-100.transition-opacity[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                              path[d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"]
+                              polyline[points="15,3 21,3 21,9"]
+                              line[x1="10" y1="14" x2="21" y2="3"]
+                        - else
+                          = news.title || "Untitled Article"
+                  
+                  / Status indicator
+                  .flex-shrink-0
                     - if news.summary.present?
-                      span.tag.is-success.is-small ✓ Analyzed
+                      .flex.items-center.space-x-2.px-3.py-1.bg-green-100.text-green-800.rounded-full.text-sm.font-medium
+                        svg.w-4.h-4[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                          path[d="M9 12l2 2 4-4"]
+                          circle[cx="12" cy="12" r="10"]
+                        span AI Analyzed
                     - else
-                      span.tag.is-warning.is-small ⏳ Processing
-              - if news.summary.present?
-                .content.mt-2
-                  p.is-size-7 = truncate(news.summary, length: 200)
-          - if workspace.news_pieces.count > 5
-            .has-text-centered.mt-3
-              p.is-size-7.has-text-grey
-                | + #{workspace.news_pieces.count - 5} more articles
-      - else
-        .content.has-text-grey.has-text-centered.p-4
-          p No news articles available yet
+                      .flex.items-center.space-x-2.px-3.py-1.bg-amber-100.text-amber-800.rounded-full.text-sm.font-medium
+                        svg.w-4.h-4.animate-spin[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                          path[d="M21 12a9 9 0 11-6.219-8.56"]
+                        span Processing
+                
+                / Action buttons
+                .mt-4.flex.items-center.space-x-3
+                  = link_to summary_company_workspace_news_piece_path(workspace, news), class: "flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm hover:shadow-md", data: { turbo_frame: :remote_modal } do
+                    svg.w-4.h-4[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                      path[d="M9 12l2 2 4-4"]
+                      circle[cx="12" cy="12" r="10"]
+                    span Read Full Analysis
+                  
+                  - if news.url.present?
+                    = link_to news.url, target: "_blank", class: "flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                      svg.w-4.h-4[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                        path[d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"]
+                        polyline[points="15,3 21,3 21,9"]
+                        line[x1="10" y1="14" x2="21" y2="3"]
+                      span View Original
+
+      / Load more section
+      - if workspace.news_pieces.count > 10
+        .text-center.mt-8.p-6.bg-gray-50.rounded-xl.border.border-gray-200
+          .space-y-3
+            .text-gray-600
+              = workspace.news_pieces.count - 10
+              |  more articles available
+            button.px-6.py-3.bg-blue-600.text-white.rounded-lg.hover:bg-blue-700.transition-colors.font-medium.shadow-sm.hover:shadow-md
+              | Load More Articles
+              svg.inline.w-4.h-4.ml-2[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+                polyline[points="6,9 12,15 18,9"]
+
+  / Empty state with enhanced design
+  - else
+    .text-center.py-16.space-y-6
+      .flex.justify-center
+        .w-24.h-24.bg-gray-100.rounded-full.flex.items-center.justify-center
+          svg.w-12.h-12.text-gray-400[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+            path[d="M12 19l7-7 3 3-7 7-3-3z"]
+            path[d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"]
+            path[d="M2 2l7.586 7.586"]
+            circle[cx="11" cy="11" r="2"]
+      
+      .space-y-2
+        h3.text-xl.font-semibold.text-gray-900 No news articles yet
+        p.text-gray-600.max-w-md.mx-auto
+          | We're actively monitoring news sources for 
+          span.font-medium = workspace.company_symbol
+          | . Articles will appear here as they're published and analyzed.
+      
+      .flex.justify-center.space-x-4
+        .px-4.py-2.bg-blue-100.text-blue-800.rounded-full.text-sm.font-medium
+          svg.inline.w-4.h-4.mr-2[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+            circle[cx="12" cy="12" r="10"]
+            polyline[points="12,6 12,12 16,14"]
+          | Real-time monitoring active
+                 .px-4.py-2.bg-green-100.text-green-800.rounded-full.text-sm.font-medium
+           svg.inline.w-4.h-4.mr-2[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+             path[d="M9 12l2 2 4-4"]
+             circle[cx="12" cy="12" r="10"]
+           | AI analysis ready
+
+/ Global Turbo Frame for remote modals
+= turbo_frame_tag :remote_modal

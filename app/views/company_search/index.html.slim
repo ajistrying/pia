@@ -1,21 +1,29 @@
-.container.mx-auto.flex.flex-col.justify-center.items-center.h-screen
-    .flex.flex-col.justify-center.items-center.w-4/5
-        h3.text-3xl.font-bold Pia
-        h4.text-xl.text-gray-600.mb-4 Analyze companies with AI-powered insights
-        div data-controller="company-search" class="relative"
-            .flex.mt-4
-                .relative.flex-1
-                    input.w-full.px-4.py-3.pl-12.text-lg.border.border-gray-300.rounded-lg.focus:ring-2.focus:ring-blue-500.focus:border-blue-500 type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
-                    .absolute.left-3.top-1/2.transform.-translate-y-1/2.text-gray-400
-                        = icon "search", library: "lucide", class: "w-6 h-6"
-            .mt-2#search-results data-company-search-target="results" class="absolute top-full left-0 right-0 z-10 hidden"
-    
-    .flex.flex-col.justify-center.items-center.w-4/5.mt-20
-        h2.text-xl.font-semibold.mb-4 Existing Workspaces
-        - if @workspaces.any?
-            .grid.grid-cols-1.md:grid-cols-2.gap-4.mt-4.w-full
-                - @workspaces.each do |workspace|
-                    .col-span-1
+.min-h-screen.bg-gray-50.py-12
+    .container.mx-auto.px-4
+        / Header Section
+        .text-center.mb-12
+            h1.text-4xl.md:text-5xl.font-bold.text-gray-900.mb-4 PIA
+            p.text-xl.text-gray-600 Personalized Investment Assistant, AI-powered
+        
+        / Search Section
+        .max-w-3xl.mx-auto.mb-16
+            .bg-white.rounded-2xl.shadow-lg.border.border-gray-200.p-8
+                div data-controller="company-search" class="relative"
+                    .flex.items-center.gap-4
+                        .relative.flex-1
+                            .absolute.left-4.top-1/2.transform.-translate-y-1/2.text-gray-400
+                                = icon "search", library: "lucide", class: "w-5 h-5"
+                            input.w-full.pl-12.pr-4.py-4.text-lg.border.border-gray-300.rounded-xl.focus:ring-2.focus:ring-green-500.focus:border-green-500.transition-colors type="text" placeholder="Enter Company Ticker (e.g., AAPL, TSLA)" data-company-search-target="input" data-action="input->company-search#search"
+                    .mt-2#search-results data-company-search-target="results" class="absolute top-full left-0 right-0 z-10 hidden"
+        
+        / Recently Analyzed Section
+        .max-w-6xl.mx-auto
+            h2.text-2xl.font-semibold.mb-8.text-gray-900 Recently Analyzed
+            - if @workspaces.any?
+                .grid.grid-cols-1.md:grid-cols-2.xl:grid-cols-2.gap-6
+                    - @workspaces.each do |workspace|
                         = render Workspace::CardComponent.new(workspace: workspace)
-        - else
-            p.text-gray-400 No existing workspaces, start by searching for a company.
+            - else
+                .text-center.py-12
+                    .text-gray-400.text-lg No companies analyzed yet
+                    .text-gray-500.mt-2 Start by searching for a company ticker above

@@ -35,7 +35,11 @@ Rails.application.routes.draw do
     resources :earnings_calls, only: [:destroy]
     resources :key_ratios, only: [:destroy]
     resources :financial_statements, only: [:destroy]
-    resources :news_pieces, only: [:destroy]
+    resources :news_pieces, only: [:destroy] do
+      member do
+        get :summary
+      end
+    end
     resources :research_reports, only: [:destroy]
   end
 end
