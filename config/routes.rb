@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :company_workspaces, only: [:destroy, :create, :show, :update, :edit] do
     member do
       get :workspace_content
+      get :financial_ratios_tab
       
       post :pull_sec_filing
       post :pull_earnings_call

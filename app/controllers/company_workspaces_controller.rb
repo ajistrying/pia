@@ -1,5 +1,5 @@
 class CompanyWorkspacesController < ApplicationController
-  before_action :set_workspace, only: [:show, :workspace_content]
+  before_action :set_workspace, only: [:show, :workspace_content, :financial_ratios_tab]
   before_action :ensure_workspace_processing, only: [:show]
 
   def create
@@ -25,7 +25,8 @@ class CompanyWorkspacesController < ApplicationController
       when 'sec-filings'
         render partial: 'tab_sec_filings', locals: { workspace: @workspace }
       when 'financial-ratios'
-        render partial: 'tab_financial_ratios', locals: { workspace: @workspace }
+        @ratio_tab = params[:ratio_tab] || 'profitability'
+        render partial: 'tab_financial_ratios', locals: { workspace: @workspace, active_tab: @ratio_tab }
       when 'news-sentiment'
         render partial: 'tab_news_sentiment', locals: { workspace: @workspace }
       when 'financial-statements'
@@ -41,6 +42,13 @@ class CompanyWorkspacesController < ApplicationController
         # Show loading while job processes
         render partial: "company_workspaces/loading_skeleton_component"
       end
+    end
+  end
+
+  def financial_ratios_tab
+    @ratio_tab = params[:ratio_tab] || 'profitability'
+    respond_to do |format|
+      format.html { render partial: 'tab_financial_ratios', locals: { workspace: @workspace, active_tab: @ratio_tab } }
     end
   end
 

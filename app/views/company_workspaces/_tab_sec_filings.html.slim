@@ -15,36 +15,92 @@
     / Content Area
     .p-4
       - if workspace.sec_filings.any?
-        .space-y-4#sec-filings-list
-          - workspace.sec_filings.order(filing_date: :desc).each do |filing|
-            .bg-white.shadow-sm.rounded-lg.border.p-4.sec-filing-card data-form-type=filing.form_type data-date=filing.filing_date&.strftime("%Y-%m-%d")
-              / Header with filing type and actions
-              .flex.justify-between.items-start.mb-3
-                .flex.items-center.gap-2
-                  span.text-lg.font-medium
-                    = get_filing_icon(filing.form_type)
-                  .space-y-1
-                    h3.text-lg.font-semibold = get_filing_title(filing.form_type)
-                    p.text-sm.text-gray-600 = "Filed on #{filing.filing_date&.strftime('%B %d, %Y') || 'Unknown date'}"
-                
+        .space-y-6#sec-filings-list
+          - grouped_filings = workspace.sec_filings.where.not(filing_date: nil).order(filing_date: :desc).group_by { |f| f.filing_date.year }
+          - grouped_filings.keys.sort.reverse.each do |year|
+            .year-group
+              / Year Header
+              .mb-4
+                h3.text-lg.font-bold.text-gray-800.border-b.border-gray-200.pb-2
+                  = year
+              
+              / Month Groups within Year
+              .space-y-4
+                - month_groups = grouped_filings[year].group_by { |f| f.filing_date.month }
+                - month_groups.keys.sort.reverse.each do |month|
+                  .month-group
+                    / Month Header
+                    .mb-3
+                      h4.text-base.font-semibold.text-gray-700.ml-4
+                        = Date::MONTHNAMES[month]
+                    
+                    / Filings for this month
+                    .space-y-3.ml-8
+                      - month_groups[month].sort_by(&:filing_date).reverse.each do |filing|
+                        .bg-white.shadow-sm.rounded-lg.border.p-4.sec-filing-card data-form-type=filing.form_type data-date=filing.filing_date&.strftime("%Y-%m-%d")
+                          / Header with filing type and actions
+                          .flex.justify-between.items-start.mb-3
+                            .flex.items-center.gap-2
+                              span.text-lg.font-medium
+                                = get_filing_icon(filing.form_type)
+                              .space-y-1
+                                h3.text-lg.font-semibold = get_filing_title(filing.form_type)
+                                p.text-sm.text-gray-600 = "Filed on #{filing.filing_date&.strftime('%B %d, %Y') || 'Unknown date'}"
+                            
 
-              / Filing Content
-              - if filing.summary.present?
-                .mb-4
-                  .space-y-3
-                    = render_filing_highlights(filing)
+                          / Filing Content
+                          - if filing.summary.present?
+                            / Action Buttons
+                            .flex.gap-3.pt-3.border-t.items-center
+                              - if filing.summary.present?
+                                = link_to summary_company_workspace_sec_filing_path(workspace, filing), class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium", data: { turbo_frame: :remote_modal } do
+                                  | View Full Summary
+                              - if filing.sec_link.present?
+                                = link_to filing.sec_link, target: "_blank", class: "text-green-600 hover:text-green-700 font-medium text-sm"
+                                  | View SEC Document
+                          - else
+                            .text-gray-500.text-sm.italic
+                              | Processing filing content. Summary will be available once analysis is complete.
 
-                / Action Buttons
-                .flex.gap-3.pt-3.border-t.items-center
-                  - if filing.summary.present?
-                    = link_to summary_company_workspace_sec_filing_path(workspace, filing), class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium", data: { turbo_frame: :remote_modal } do
-                      | View Full Summary
-                  - if filing.sec_link.present?
-                    = link_to filing.sec_link, target: "_blank", class: "text-green-600 hover:text-green-700 font-medium text-sm"
-                      | View SEC Document
-              - else
-                .text-gray-500.text-sm.italic
-                  | Processing filing content. Summary will be available once analysis is complete.
+          / Handle filings without dates
+          - filings_without_dates = workspace.sec_filings.where(filing_date: nil)
+          - if filings_without_dates.any?
+            .year-group
+              / Unknown Date Header
+              .mb-4
+                h3.text-lg.font-bold.text-gray-800.border-b.border-gray-200.pb-2
+                  | Unknown Date
+              
+              .space-y-3.ml-8
+                - filings_without_dates.order(created_at: :desc).each do |filing|
+                  .bg-white.shadow-sm.rounded-lg.border.p-4.sec-filing-card data-form-type=filing.form_type data-date=""
+                    / Header with filing type and actions
+                    .flex.justify-between.items-start.mb-3
+                      .flex.items-center.gap-2
+                        span.text-lg.font-medium
+                          = get_filing_icon(filing.form_type)
+                        .space-y-1
+                          h3.text-lg.font-semibold = get_filing_title(filing.form_type)
+                          p.text-sm.text-gray-600 = "Filed on #{filing.filing_date&.strftime('%B %d, %Y') || 'Unknown date'}"
+                      
+
+                    / Filing Content
+                    - if filing.summary.present?
+                      .mb-4
+                        .space-y-3
+                          = render_filing_highlights(filing)
+
+                      / Action Buttons
+                      .flex.gap-3.pt-3.border-t.items-center
+                        - if filing.summary.present?
+                          = link_to summary_company_workspace_sec_filing_path(workspace, filing), class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium", data: { turbo_frame: :remote_modal } do
+                            | View Full Summary
+                        - if filing.sec_link.present?
+                          = link_to filing.sec_link, target: "_blank", class: "text-green-600 hover:text-green-700 font-medium text-sm"
+                            | View SEC Document
+                    - else
+                      .text-gray-500.text-sm.italic
+                        | Processing filing content. Summary will be available once analysis is complete.
 
       - else
         .text-center.py-12
@@ -75,6 +131,17 @@ javascript:
                        content.includes(searchTerm);
         
         card.style.display = matches ? 'block' : 'none';
+      });
+      
+      // Show/hide year and month groups based on visible cards
+      document.querySelectorAll('.year-group').forEach(yearGroup => {
+        const visibleCards = yearGroup.querySelectorAll('.sec-filing-card[style="display: block"], .sec-filing-card:not([style*="display: none"])');
+        yearGroup.style.display = visibleCards.length > 0 ? 'block' : 'none';
+      });
+      
+      document.querySelectorAll('.month-group').forEach(monthGroup => {
+        const visibleCards = monthGroup.querySelectorAll('.sec-filing-card[style="display: block"], .sec-filing-card:not([style*="display: none"])');
+        monthGroup.style.display = visibleCards.length > 0 ? 'block' : 'none';
       });
     }
 

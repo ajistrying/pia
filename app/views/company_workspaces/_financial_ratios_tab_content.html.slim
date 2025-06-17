@@ -1,0 +1,129 @@
+- ratio_data = KeyRatio.categorized_ratios_with_analysis(workspace)
+- active_tab = local_assigns[:active_tab] || 'profitability'
+
+- case active_tab
+- when 'profitability'
+  - if ratio_data[:profitability].any?
+    .space-y-6
+      - ratio_data[:profitability].each do |ratio_info|
+        .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
+          .flex.items-start.justify-between
+            .flex-1
+              h3.text-lg.font-semibold.text-gray-900.mb-3
+                = ratio_info[:ratio].ratio_name.gsub(' Margin', ' Margin').gsub(' Return', ' Return')
+              
+              - if ratio_info[:change_data]
+                .mb-4
+                  - change = ratio_info[:change_data]
+                  - if change[:is_improvement]
+                    .inline-flex.items-center.text-green-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(1)}% → #{change[:current_value].round(1)}%"
+                  - else
+                    .inline-flex.items-center.text-red-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(1)}% → #{change[:current_value].round(1)}%"
+              - else
+                .mb-4
+                  span.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-sm.font-medium.bg-gray-100.text-gray-800
+                    = ratio_info[:ratio].formatted_value
+              
+              p.text-gray-600.text-sm.leading-relaxed.mb-4
+                = ratio_info[:analysis]
+              
+              a.inline-flex.items-center.text-green-600.hover:text-green-700.font-medium.text-sm.transition-colors.duration-200.detailed-analysis-link[href="#"]
+                | View Detailed Analysis
+  - else
+    .text-center.py-12
+      .text-gray-400.mb-4
+        svg.w-12.h-12.mx-auto[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
+          path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"]
+      p.text-gray-500.font-medium No profitability ratios available for analysis.
+
+- when 'liquidity'
+  - if ratio_data[:liquidity].any?
+    .space-y-6
+      - ratio_data[:liquidity].each do |ratio_info|
+        .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
+          .flex.items-start.justify-between
+            .flex-1
+              h3.text-lg.font-semibold.text-gray-900.mb-3
+                = ratio_info[:ratio].ratio_name
+              
+              - if ratio_info[:change_data]
+                .mb-4
+                  - change = ratio_info[:change_data]
+                  - if change[:is_improvement]
+                    .inline-flex.items-center.text-green-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(2)} → #{change[:current_value].round(2)}"
+                  - else
+                    .inline-flex.items-center.text-red-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(2)} → #{change[:current_value].round(2)}"
+              - else
+                .mb-4
+                  span.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-sm.font-medium.bg-gray-100.text-gray-800
+                    = ratio_info[:ratio].formatted_value
+              
+              p.text-gray-600.text-sm.leading-relaxed.mb-4
+                = ratio_info[:analysis]
+              
+              a.inline-flex.items-center.text-green-600.hover:text-green-700.font-medium.text-sm.transition-colors.duration-200.detailed-analysis-link[href="#"]
+                | View Detailed Analysis
+  - else
+    .text-center.py-12
+      .text-gray-400.mb-4
+        svg.w-12.h-12.mx-auto[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
+          path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"]
+      p.text-gray-500.font-medium No liquidity ratios available for analysis.
+
+- when 'solvency'
+  - if ratio_data[:solvency].any?
+    .space-y-6
+      - ratio_data[:solvency].each do |ratio_info|
+        .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
+          .flex.items-start.justify-between
+            .flex-1
+              h3.text-lg.font-semibold.text-gray-900.mb-3
+                = ratio_info[:ratio].ratio_name
+              
+              - if ratio_info[:change_data]
+                .mb-4
+                  - change = ratio_info[:change_data]
+                  - if change[:is_improvement]
+                    .inline-flex.items-center.text-green-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(2)} → #{change[:current_value].round(2)}"
+                  - else
+                    .inline-flex.items-center.text-red-600.font-medium
+                      svg.w-4.h-4.mr-1[viewBox="0 0 20 20" fill="currentColor"]
+                        path[fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"]
+                      span.text-sm
+                        = "#{change[:previous_value].round(2)} → #{change[:current_value].round(2)}"
+              - else
+                .mb-4
+                  span.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-sm.font-medium.bg-gray-100.text-gray-800
+                    = ratio_info[:ratio].formatted_value
+              
+              p.text-gray-600.text-sm.leading-relaxed.mb-4
+                = ratio_info[:analysis]
+              
+              a.inline-flex.items-center.text-green-600.hover:text-green-700.font-medium.text-sm.transition-colors.duration-200.detailed-analysis-link[href="#"]
+                | View Detailed Analysis
+  - else
+    .text-center.py-12
+      .text-gray-400.mb-4
+        svg.w-12.h-12.mx-auto[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
+          path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"]
+      p.text-gray-500.font-medium No solvency ratios available for analysis. 
