@@ -15,3 +15,6 @@ application.register("tabs", TabsController);
 
 import DrawerController from "./drawer_controller";
 application.register("drawer", DrawerController);
+
+import RemoteModalController from "./remote_modal_controller";
+application.register("remote-modal", RemoteModalController);

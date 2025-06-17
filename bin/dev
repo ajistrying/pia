@@ -1,11 +1,21 @@
 #!/usr/bin/env sh
-
-if gem list --no-installed --exact --silent foreman; then
-  echo "Installing foreman..."
-  gem install foreman
-fi
+# Load environment variables from .env.development if it exists
+[ -f .env.development ] && { set -a; . ./.env.development; set +a; }
 
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
-exec foreman start -f Procfile.dev --env /dev/null "$@"
+# Check if overmind sock file exists and process is running
+if overmind status -s .overmind.sock &> /dev/null; then
+  echo "Overmind is already running"
+  exit 1
+fi
+
+# If the socket exists, but overmind isn't running, remove the socket, silence the output
+if [ -f .overmind.sock ] &> /dev/null; then
+  echo ".overmind.sock exists, but overmind isn't running. Removing socket..."
+  rm .overmind.sock
+fi
+
+echo "Starting Overmind"
+exec overmind start -f Procfile.dev "$@"

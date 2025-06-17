@@ -24,13 +24,17 @@ Rails.application.routes.draw do
       post :pull_financial_statement
       post :pull_news_piece
       post :pull_research_report
-
-      resources :sec_filings, only: [:destroy]
-      resources :earnings_calls, only: [:destroy]
-      resources :key_ratios, only: [:destroy]
-      resources :financial_statements, only: [:destroy]
-      resources :news_pieces, only: [:destroy]
-      resources :research_reports, only: [:destroy]
     end
+    
+    resources :sec_filings, only: [:destroy] do
+      member do
+        get :summary
+      end
+    end
+    resources :earnings_calls, only: [:destroy]
+    resources :key_ratios, only: [:destroy]
+    resources :financial_statements, only: [:destroy]
+    resources :news_pieces, only: [:destroy]
+    resources :research_reports, only: [:destroy]
   end
 end

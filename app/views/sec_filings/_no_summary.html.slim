@@ -1,0 +1,23 @@
+= turbo_frame_tag :remote_modal do
+  dialog.fixed.inset-0.m-auto.p-0.w-11/12.max-w-4xl.bg-white.rounded-lg.shadow-lg.backdrop:bg-gray-600.backdrop:bg-opacity-50 data-controller="remote-modal" data-action="click->remote-modal#backdropClick" aria-labelledby="modal_title"
+    .p-6
+      / Modal Header
+      .flex.justify-between.items-center.mb-4
+        h2#modal_title.text-xl.font-bold.text-gray-900
+          | SEC Filing Summary
+        form method="dialog"
+          button.text-gray-400.bg-transparent.hover:bg-gray-200.hover:text-gray-900.rounded-lg.text-sm.p-1.5 type="submit" aria-label="Close"
+            svg.w-5.h-5 fill="currentColor" viewBox="0 0 20 20"
+              path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"
+      
+      / Modal Body
+      .text-center.py-8.text-gray-500
+        i.fas.fa-file-alt.text-4xl.text-gray-300.mb-4
+        h3.text-lg.font-medium.text-gray-600.mb-2 No Summary Available
+        p.text-sm Summary is still being processed for this filing.
+      
+      / Modal Footer
+      .flex.justify-end.mt-6
+        form method="dialog"
+          button.px-4.py-2.bg-gray-300.text-gray-700.rounded-lg.hover:bg-gray-400.transition-colors type="submit"
+            | Close
