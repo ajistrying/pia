@@ -1,17 +1,18 @@
 / Completion notification
 #progress-indicator.mb-4
-  .notification.is-success.is-light data-controller="notification"
-    button.delete data-action="click->notification#delete"
-    .content
-      .level
-        .level-left
-          .level-item
-            span.icon.is-large.has-text-success
-              | ✅
-        .level-item
-          .content
-            h5.title.is-6.has-text-success.mb-1 Update Complete!
-            p.subtitle.is-7.has-text-grey-dark 
-              | #{workspace.company_name} data has been successfully updated
-            p.is-size-7.has-text-grey
-              | Last updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}
+  .bg-green-50.border.border-green-200.rounded-lg.p-4 data-controller="notification"
+    .flex.items-start.justify-between
+      .flex.items-start.space-x-3
+        .flex-shrink-0
+          .w-8.h-8.flex.items-center.justify-center.text-green-500
+            | ✅
+        .flex-1
+          h5.text-lg.font-semibold.text-green-800.mb-1 Update Complete!
+          p.text-sm.text-green-700.mb-2
+            | #{workspace.company_name} data has been successfully updated
+          p.text-xs.text-green-600
+            | Last updated: #{workspace.last_successful_update&.strftime("%B %d, %Y at %I:%M %p")}
+      .flex-shrink-0
+        button.text-green-400.hover:text-green-600.transition-colors data-action="click->notification#delete"
+          svg.w-5.h-5[viewBox="0 0 20 20" fill="currentColor"]
+            path[fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"]

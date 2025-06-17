@@ -1,7 +1,4 @@
 = turbo_frame_tag "workspace-content"
-  / Progress indicator (will be replaced when processing starts)
-  #progress-indicator
-  
   / Company Header
   .bg-white.shadow-sm.rounded-lg.p-6.mb-5
     .flex.justify-between.items-center.mb-4
@@ -23,51 +20,25 @@
     - revenue_growth_ratio = workspace.key_ratios.find_by(ratio_name: 'revenueGrowth')
     - net_margin_ratio = workspace.key_ratios.find_by(ratio_name: 'netProfitMargin')
     - pe_ratio = workspace.key_ratios.find_by(ratio_name: 'peRatio')
-    
-    .grid.grid-cols-3.gap-0
-      .text-center.px-4
-        - if revenue_growth_ratio&.ratio_value
-          - growth_value = revenue_growth_ratio.ratio_value
-          - growth_class = growth_value >= 0 ? 'text-green-600' : 'text-red-600'
-          p.text-lg.font-semibold class=growth_class
-            = growth_value >= 0 ? '+' : ''
-            = number_to_percentage(growth_value, precision: 1)
-        - else
-          p.text-lg.font-semibold.text-gray-400 --
-        p.text-sm.text-gray-600.font-medium Revenue Growth %
-        p.text-xs.text-gray-500 Year-over-year revenue growth rate
-      
-      .column.has-text-centered.px-4
-        - if net_margin_ratio&.ratio_value
-          p.text-lg.font-semibold.text-green-600 = number_to_percentage(net_margin_ratio.ratio_value, precision: 1)
-        - else
-          p.title.is-5.has-text-grey-light --
-        p.text-sm.text-gray-600.font-medium Net Income Margin
-        p.text-xs.text-gray-500 Profit margins from operations
-      
-      .column.has-text-centered.px-4
-        - if pe_ratio&.ratio_value
-          - pe_value = pe_ratio.ratio_value
-          - pe_class = pe_value <= 25 ? 'text-green-600' : 'text-yellow-600'
-          p.text-lg.font-semibold class=pe_class = number_with_precision(pe_value, precision: 1)
-        - else
-          p.title.is-5.has-text-grey-light --
-        p.text-sm.text-gray-600.font-medium P/E Ratio
-        p.text-xs.text-gray-500 Price-to-earnings valuation
 
-    / Navigation Tabs
-    .border-b.border-gray-200.mb-0 data-controller="tabs" data-tabs-workspace-id-value="#{workspace.id}"
-      nav.-mb-px.flex.space-x-8
-        a.whitespace-nowrap.py-2.px-1.border-b-2.border-blue-500.text-blue-600.font-medium.text-sm.cursor-pointer data-tabs-target="tab" data-tab-content="overview" data-action="click->tabs#switch"
-          span Overview
-        a.whitespace-nowrap.py-2.px-1.border-b-2.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300.font-medium.text-sm.cursor-pointer data-tabs-target="tab" data-tab-content="sec-filings" data-action="click->tabs#switch"
-          span SEC Filings
-        a.whitespace-nowrap.py-2.px-1.border-b-2.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300.font-medium.text-sm.cursor-pointer data-tabs-target="tab" data-tab-content="financial-ratios" data-action="click->tabs#switch"
-          span Financial Ratios
-        a.whitespace-nowrap.py-2.px-1.border-b-2.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300.font-medium.text-sm.cursor-pointer data-tabs-target="tab" data-tab-content="news-sentiment" data-action="click->tabs#switch"
-          span News & Sentiment
-        a.whitespace-nowrap.py-2.px-1.border-b-2.border-transparent.text-gray-500.hover:text-gray-700.hover:border-gray-300.font-medium.text-sm.cursor-pointer data-tabs-target="tab" data-tab-content="financial-statements" data-action="click->tabs#switch"
-          span Financial Statements
+  / Navigation Tabs
+  .rounded-lg.my-4 data-controller="tabs" data-tabs-workspace-id-value="#{workspace.id}"
+    nav.flex.space-x-1.p-1
+      a.flex.items-center.space-x-2.px-4.py-2.rounded-lg.font-medium.text-sm.cursor-pointer.bg-white.text-blue-600.shadow-sm data-tabs-target="tab" data-tab-content="overview" data-action="click->tabs#switch"
+        = icon "activity", library: "lucide", class: "w-4 h-4"
+        span Overview
+      a.flex.items-center.space-x-2.px-4.py-2.rounded-lg.font-medium.text-sm.cursor-pointer.text-gray-600.hover:text-gray-900.hover:bg-white.transition-colors data-tabs-target="tab" data-tab-content="sec-filings" data-action="click->tabs#switch"
+        = icon "archive", library: "lucide", class: "w-4 h-4"
+        span SEC Filings
+      a.flex.items-center.space-x-2.px-4.py-2.rounded-lg.font-medium.text-sm.cursor-pointer.text-gray-600.hover:text-gray-900.hover:bg-white.transition-colors data-tabs-target="tab" data-tab-content="financial-ratios" data-action="click->tabs#switch"
+        = icon "arrow-up", library: "lucide", class: "w-4 h-4"
+        span Financial Ratios
+      a.flex.items-center.space-x-2.px-4.py-2.rounded-lg.font-medium.text-sm.cursor-pointer.text-gray-600.hover:text-gray-900.hover:bg-white.transition-colors data-tabs-target="tab" data-tab-content="news-sentiment" data-action="click->tabs#switch"
+        = icon "antenna", library: "lucide", class: "w-4 h-4"
+        span News & Sentiment
+      a.flex.items-center.space-x-2.px-4.py-2.rounded-lg.font-medium.text-sm.cursor-pointer.text-gray-600.hover:text-gray-900.hover:bg-white.transition-colors data-tabs-target="tab" data-tab-content="financial-statements" data-action="click->tabs#switch"
+        = icon "align-justify", library: "lucide", class: "w-4 h-4"
+        span Financial Statements
 
   / Dynamic Tab Content Container
   #tab-content-container

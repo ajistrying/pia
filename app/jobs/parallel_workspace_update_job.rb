@@ -17,7 +17,7 @@ class ParallelWorkspaceUpdateJob < ApplicationJob
       # ProcessEarningsCallsJob.perform_later(workspace_id), # Commented out - requires higher API tier
       ProcessFinancialStatementsJob.perform_later(workspace_id),
       ProcessKeyRatiosJob.perform_later(workspace_id),
-      ProcessEnterpriseValueJob.perform_later(workspace_id),
+      # ProcessEnterpriseValueJob.perform_later(workspace_id),
       ProcessAnalystRatingsJob.perform_later(workspace_id),
       ProcessNewsJob.perform_later(workspace_id)
     ]

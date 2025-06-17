@@ -11,14 +11,6 @@ class ProcessKeyRatiosJob < ApplicationJob
     
     if result.success?
       tracker.mark_task_complete('key_ratios')
-      
-      workspace = CompanyWorkspace.find(workspace_id)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "workspace_#{workspace.id}",
-        target: "key-ratios-section",
-        partial: "company_workspaces/key_ratios",
-        locals: { workspace: workspace }
-      )
     else
       Rails.logger.error("Error processing key ratios: #{result.failure}")
     end

@@ -48,7 +48,7 @@ class FinalizeWorkspaceUpdateJob < ApplicationJob
       locals: { workspace: workspace }
     )
     
-    # Broadcast completion notification
+    # Broadcast completion notification to the progress indicator outside the frame
     Turbo::StreamsChannel.broadcast_replace_to(
       "workspace_#{workspace.id}",
       target: "progress-indicator",

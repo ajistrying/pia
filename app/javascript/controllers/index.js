@@ -18,3 +18,6 @@ application.register("drawer", DrawerController);
 
 import RemoteModalController from "./remote_modal_controller";
 application.register("remote-modal", RemoteModalController);
+
+import AccordionController from "./accordion_controller";
+application.register("accordion", AccordionController);

@@ -11,14 +11,6 @@ class ProcessEarningsCallsJob < ApplicationJob
     
     if result.success?
       tracker.mark_task_complete('earnings_calls')
-      
-      workspace = CompanyWorkspace.find(workspace_id)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "workspace_#{workspace.id}",
-        target: "earnings-calls-section",
-        partial: "company_workspaces/earnings_calls",
-        locals: { workspace: workspace }
-      )
     else
       Rails.logger.error("Error processing earnings calls: #{result.failure}")
     end

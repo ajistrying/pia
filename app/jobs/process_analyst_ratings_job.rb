@@ -11,14 +11,6 @@ class ProcessAnalystRatingsJob < ApplicationJob
     
     if result.success?
       tracker.mark_task_complete('analyst_ratings')
-      
-      workspace = CompanyWorkspace.find(workspace_id)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "workspace_#{workspace.id}",
-        target: "analyst-ratings-section",
-        partial: "company_workspaces/analyst_ratings",
-        locals: { workspace: workspace }
-      )
     else
       Rails.logger.error("Error processing analyst ratings: #{result.failure}")
     end

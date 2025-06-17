@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     member do
       get :workspace_content
       get :financial_ratios_tab
+      get :financial_statements_tab
       
       post :pull_sec_filing
       post :pull_earnings_call
@@ -25,6 +26,12 @@ Rails.application.routes.draw do
       post :pull_financial_statement
       post :pull_news_piece
       post :pull_research_report
+      
+      # Manual refresh routes
+      post :refresh_sec_filings
+      post :refresh_financial_ratios
+      post :refresh_news_sentiment
+      post :refresh_financial_statements
     end
     
     resources :sec_filings, only: [:destroy] do

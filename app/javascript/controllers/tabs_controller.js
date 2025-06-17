@@ -13,14 +13,14 @@ export default class extends Controller {
 
 		// Remove active class from all tabs
 		this.tabTargets.forEach((tab) => {
-			tab.classList.remove("border-blue-500", "text-blue-600");
-			tab.classList.add("border-transparent", "text-gray-500");
+			tab.classList.remove("bg-white", "text-blue-600", "shadow-sm");
+			tab.classList.add("text-gray-600");
 		});
 
 		// Add active class to clicked tab
 		const clickedTab = event.currentTarget;
-		clickedTab.classList.remove("border-transparent", "text-gray-500");
-		clickedTab.classList.add("border-blue-500", "text-blue-600");
+		clickedTab.classList.remove("text-gray-600");
+		clickedTab.classList.add("bg-white", "text-blue-600", "shadow-sm");
 
 		// Get tab content name
 		const targetContent = clickedTab.dataset.tabContent;

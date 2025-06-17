@@ -13,6 +13,7 @@ class FinancialModelingPrep::ProcessNews < FinancialModelingPrep::BaseInteractor
     
     # Fetch news data
     fetch_fmp_articles(workspace)
+    fetch_stock_specific_news(workspace)
     fetch_general_news(workspace)
     
     Rails.logger.info "Completed processing news for #{workspace.company_symbol}"
@@ -41,7 +42,7 @@ class FinancialModelingPrep::ProcessNews < FinancialModelingPrep::BaseInteractor
       # Skip if we already have this article
       next if NewsPiece.exists?(
         company_workspace: workspace,
-        url: article['url']
+        url: article['link']
       )
       
       summary = generate_news_summary(article['content'], workspace.company_symbol) if article['content']
@@ -49,7 +50,7 @@ class FinancialModelingPrep::ProcessNews < FinancialModelingPrep::BaseInteractor
       NewsPiece.create!(
         company_workspace: workspace,
         title: article['title'],
-        url: article['url'],
+        url: article['link'],
         published_date: DateTime.parse(article['date']),
         author: article['author'],
         content: article['content'],
@@ -61,6 +62,45 @@ class FinancialModelingPrep::ProcessNews < FinancialModelingPrep::BaseInteractor
     
   rescue => e
     Rails.logger.error "Error processing FMP articles for #{workspace.company_symbol}: #{e.message}"
+  end
+
+  def fetch_stock_specific_news(workspace)
+    sleep 0.5 # Rate limiting
+    
+    context.url = "https://financialmodelingprep.com/stable/news/stock?symbols=#{workspace.company_symbol}&from=#{1.year.ago.strftime('%Y-%m-%d')}&to=#{Date.current.strftime('%Y-%m-%d')}"
+    
+    # Call API directly
+    response = Faraday.get("#{context.url}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
+    context.response_result = JSON.parse(response.body)
+    
+    return unless context.response_result.is_a?(Array) && !context.response_result.empty?
+
+    Rails.logger.info "Stock-specific news: #{context.response_result.inspect}"
+    
+    context.response_result.each do |news|
+      # Skip if we already have this news
+      next if NewsPiece.exists?(
+        company_workspace: workspace,
+        url: news['url']
+      )
+      
+      summary = generate_news_summary(news['text'], workspace.company_symbol) if news['text']
+      
+      NewsPiece.create!(
+        company_workspace: workspace,
+        title: news['title'],
+        url: news['url'],
+        published_date: DateTime.parse(news['publishedDate']),
+        author: news['publisher'],
+        content: news['text'],
+        summary: summary
+      )
+    end
+    
+    Rails.logger.info "Stored #{context.response_result.length} stock-specific news articles for #{workspace.company_symbol}"
+    
+  rescue => e
+    Rails.logger.error "Error processing stock-specific news for #{workspace.company_symbol}: #{e.message}"
   end
 
   def fetch_general_news(workspace)

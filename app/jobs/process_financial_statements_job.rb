@@ -11,14 +11,6 @@ class ProcessFinancialStatementsJob < ApplicationJob
     
     if result.success?
       tracker.mark_task_complete('financial_statements')
-      
-      workspace = CompanyWorkspace.find(workspace_id)
-      Turbo::StreamsChannel.broadcast_replace_to(
-        "workspace_#{workspace.id}",
-        target: "financial-statements-section",
-        partial: "company_workspaces/financial_statements",
-        locals: { workspace: workspace }
-      )
     else
       Rails.logger.error("Error processing financial statements: #{result.failure}")
     end
