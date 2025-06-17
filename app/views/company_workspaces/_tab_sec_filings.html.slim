@@ -1,55 +1,96 @@
-.box
-  .content
-    h2.title.is-4.mb-4
-      span.icon.is-small.mr-2
-        i.fas.fa-file-alt
-      | SEC Filings
-    p.subtitle.is-6.has-text-grey-dark Complete regulatory filing history
-    
-    - if workspace.sec_filings.any?
-      - filings_by_year = workspace.sec_filings.order(filing_date: :desc).group_by { |filing| filing.filing_date&.strftime("%Y") || "Unknown Date" }
+/ SEC Filings Section
+#sec-filings-section
+  .bg-white.shadow-sm.rounded-lg.border.mb-4
+    / Header with Search
+    .p-4.border-b
+      .flex.justify-between.items-center.mb-4
+        h2.text-xl.font-bold SEC Filings
+      / Search Bar
+      .flex.gap-3
+        .flex-1
+          input#sec-filings-search.w-full.px-4.py-2.border.border-gray-300.rounded-lg.focus:ring-2.focus:ring-blue-500.focus:border-transparent placeholder="Search within SEC filings..." type="text"
+        button.px-4.py-2.bg-green-600.text-white.rounded-lg.hover:bg-green-700.focus:ring-2.focus:ring-green-500.focus:ring-offset-2 type="button"
+          | Search
+
+    / Content Area
+    .p-4
+      - if workspace.sec_filings.any?
+        .space-y-4#sec-filings-list
+          - workspace.sec_filings.order(filing_date: :desc).each do |filing|
+            .bg-white.shadow-sm.rounded-lg.border.p-4.sec-filing-card data-form-type=filing.form_type data-date=filing.filing_date&.strftime("%Y-%m-%d")
+              / Header with filing type and actions
+              .flex.justify-between.items-start.mb-3
+                .flex.items-center.gap-2
+                  span.text-lg.font-medium
+                    = get_filing_icon(filing.form_type)
+                  .space-y-1
+                    h3.text-lg.font-semibold = get_filing_title(filing.form_type)
+                    p.text-sm.text-gray-600 = "Filed on #{filing.filing_date&.strftime('%Y-%m-%d') || 'Unknown date'}"
+                .flex.items-center.gap-2
+                  - if filing.summary.present?
+                    button.px-3.py-1.text-sm.font-medium.bg-blue-100.text-blue-800.rounded-lg.hover:bg-blue-200 type="button"
+                      | Summarize
+                  - else
+                    span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full
+                      | ⏳ Processing
+
+              / Filing Content
+              - if filing.summary.present?
+                .mb-4
+                  .space-y-3
+                    = render_filing_highlights(filing)
+
+                / Action Buttons
+                .flex.gap-3.pt-3.border-t
+                  - if filing.sec_link.present?
+                    = link_to filing.sec_link, target: "_blank", class: "text-green-600 hover:text-green-700 font-medium text-sm"
+                      | View Full Document
+                  - if filing.final_link.present?
+                    = link_to filing.final_link, target: "_blank", class: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                      | Download PDF
+              - else
+                .text-gray-500.text-sm.italic
+                  | Processing filing content. Summary will be available once analysis is complete.
+
+      - else
+        .text-center.py-12
+          .mb-4
+            i.fas.fa-file-alt.text-4xl.text-gray-300
+          h3.text-lg.font-medium.text-gray-600.mb-2 No SEC Filings Available
+          p.text-sm.text-gray-500 SEC filings will appear here once data is processed.
+
+/ JavaScript for search functionality
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('sec-filings-search');
+    const searchButton = searchInput.nextElementSibling;
+    const filingsList = document.getElementById('sec-filings-list');
+    const filingCards = document.querySelectorAll('.sec-filing-card');
+
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
       
-      - filings_by_year.each_with_index do |(year, filings), index|
-        .card.mb-3 data-controller="drawer"
-          header.card-header data-action="click->drawer#toggle"
-            .card-header-title
-              span.icon.mr-2
-                i.fas.fa-calendar-alt.has-text-info
-              span = year
-              span.tag.is-info.is-light.ml-2 = pluralize(filings.count, 'filing')
-            .card-header-icon
-              span.icon data-drawer-target="icon"
-                i.fas.fa-chevron-down
-          
-          .card-content.drawer-content data-drawer-target="content" class="#{'is-hidden' unless index == 0}"
-            - filings.each do |filing|
-              .box.p-4.mb-3.is-light
-                .level.is-mobile.mb-3
-                  .level-left
-                    .level-item
-                      .content
-                        p.title.is-6.mb-1 = filing.form_type
-                        p.subtitle.is-7.has-text-grey = filing.filing_date&.strftime("%B %d, %Y") || 'Unknown date'
-                  .level-right
-                    .level-item
-                      - if filing.summary.present?
-                        span.tag.is-success ✓ Analyzed
-                      - else
-                        span.tag.is-warning ⏳ Processing
-                
-                - if filing.summary.present?
-                  .content
-                    = markdown_to_html(filing.summary)
-                - else
-                  .content.has-text-grey
-                    p Processing filing content. Summary will be available once analysis is complete.
-                
-                - if filing.sec_link.present?
-                  .content.mt-3
-                    = link_to "View Original Filing", filing.sec_link, target: "_blank", class: "button is-outlined is-small"
-    - else
-      .content.has-text-grey.has-text-centered.p-5
-        span.icon.is-large.has-text-grey-lighter
-          i.fas.fa-file-alt.fa-3x
-        p.title.is-5.has-text-grey-light No SEC Filings Available
-        p.subtitle.is-6.has-text-grey SEC filings will appear here once data is processed
+      filingCards.forEach(card => {
+        const formType = card.dataset.formType.toLowerCase();
+        const date = card.dataset.date;
+        const content = card.textContent.toLowerCase();
+        
+        const matches = searchTerm === '' || 
+                       formType.includes(searchTerm) ||
+                       date.includes(searchTerm) ||
+                       content.includes(searchTerm);
+        
+        card.style.display = matches ? 'block' : 'none';
+      });
+    }
+
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+    
+    // Real-time search
+    searchInput.addEventListener('input', performSearch);
+  });

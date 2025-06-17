@@ -8,5 +8,5 @@ html
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
     = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
   body
-    div.container.is-fullhd style="height: 100vh;"
+    div.container.mx-auto.max-w-7xl.h-screen
       = yield

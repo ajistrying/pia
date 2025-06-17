@@ -25,9 +25,11 @@ class CompanyWorkspacesController < ApplicationController
       when 'sec-filings'
         render partial: 'tab_sec_filings', locals: { workspace: @workspace }
       when 'financial-ratios'
-        render partial: 'key_ratios', locals: { workspace: @workspace }
+        render partial: 'tab_financial_ratios', locals: { workspace: @workspace }
       when 'news-sentiment'
         render partial: 'tab_news_sentiment', locals: { workspace: @workspace }
+      when 'financial-statements'
+        render partial: 'tab_financial_statements', locals: { workspace: @workspace }
       else
         render partial: 'tab_overview', locals: { workspace: @workspace }
       end

@@ -1,21 +1,21 @@
-.container.is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="height: 100vh;"
-    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="width: 80%"
-        h3.title.is-3 Pia
-        h4.subtitle.is-4 Analyze companies with AI-powered insights
-        div data-controller="company-search" style="position: relative;"
-            .field.has-addons.mt-4
-                .control.has-icons-left
-                    input.input.is-large type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
-                    span.icon.is-medium.is-left
-                        = icon "search", library: "lucide", class: "w-10 h-10"
-            .mt-2#search-results data-company-search-target="results" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 10; display: none;"
+.container.mx-auto.flex.flex-col.justify-center.items-center.h-screen
+    .flex.flex-col.justify-center.items-center.w-4/5
+        h3.text-3xl.font-bold Pia
+        h4.text-xl.text-gray-600.mb-4 Analyze companies with AI-powered insights
+        div data-controller="company-search" class="relative"
+            .flex.mt-4
+                .relative.flex-1
+                    input.w-full.px-4.py-3.pl-12.text-lg.border.border-gray-300.rounded-lg.focus:ring-2.focus:ring-blue-500.focus:border-blue-500 type="text" placeholder="Search for a company (AAPL, TSLA, GOOG, MSFT, etc.)" data-company-search-target="input" data-action="input->company-search#search"
+                    .absolute.left-3.top-1/2.transform.-translate-y-1/2.text-gray-400
+                        = icon "search", library: "lucide", class: "w-6 h-6"
+            .mt-2#search-results data-company-search-target="results" class="absolute top-full left-0 right-0 z-10 hidden"
     
-    .is-flex.is-flex-direction-column.is-justify-content-center.is-align-items-center style="width: 80%; margin-top: 5em;"
-        h2.title.is-4 Existing Workspaces
+    .flex.flex-col.justify-center.items-center.w-4/5.mt-20
+        h2.text-xl.font-semibold.mb-4 Existing Workspaces
         - if @workspaces.any?
-            .columns.is-multiline.mt-4 style="width: 100%;"
-                    - @workspaces.each do |workspace|
-                        .column.is-half
-                            = render Workspace::CardComponent.new(workspace: workspace)
+            .grid.grid-cols-1.md:grid-cols-2.gap-4.mt-4.w-full
+                - @workspaces.each do |workspace|
+                    .col-span-1
+                        = render Workspace::CardComponent.new(workspace: workspace)
         - else
-            p.has-text-grey-light No existing workspaces, start by searching for a company.
+            p.text-gray-400 No existing workspaces, start by searching for a company.

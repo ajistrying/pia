@@ -1,35 +1,33 @@
 / Progress indicator for workspace updates
 #progress-indicator.mb-4
-  .card.has-background-info-light
-    .card-content
-      .level
-        .level-left
-          .level-item
-            .content
-              h5.title.is-6.has-text-info.mb-1 Updating #{workspace.company_name}
-              p.subtitle.is-7.has-text-grey-dark Gathering financial data...
-        .level-right
-          .level-item
-            .content.has-text-right
-              p.has-text-weight-bold.has-text-info #{completed_tasks}/#{total_tasks} completed
-              
+  .bg-blue-50.border.border-blue-200.rounded-lg
+    .p-6
+      .flex.justify-between.items-start.mb-4
+        .flex-1
+          .space-y-1
+            h5.text-base.font-semibold.text-blue-700.mb-1 Updating #{workspace.company_name}
+            p.text-sm.text-gray-600 Gathering financial data...
+        .text-right
+          .space-y-1
+            p.font-bold.text-blue-700 #{completed_tasks}/#{total_tasks} completed
+            
       / Progress bar
-      .progress-container.mb-3
-        progress.progress.is-info.is-medium value="#{progress}" max="100"
-          | #{progress}%
-          
+      .mb-4
+        .w-full.bg-gray-200.rounded-full.h-3
+          .bg-blue-600.h-3.rounded-full.transition-all.duration-300 style="width: #{progress}%"
+        .text-center.text-xs.text-gray-600.mt-1 #{progress}%
+        
       / Task status indicators
-      .columns.is-mobile.is-multiline.is-variable.is-1
+      .grid.grid-cols-2.sm:grid-cols-3.md:grid-cols-4.gap-2.mb-4
         - WorkspaceUpdateTracker::TASK_TYPES.each do |task_type|
           - is_completed = workspace_task_completed?(workspace.id, task_type)
-          .column.is-narrow
-            .tag class="#{is_completed ? 'is-success' : 'is-light'}"
-              span.icon.is-small
-                = is_completed ? "✓" : "○"
-              span = task_type.humanize
-              
+          .inline-flex.items-center.gap-1.px-2.py-1.rounded-full.text-xs class="#{is_completed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}"
+            span.w-3.h-3.flex.items-center.justify-center
+              = is_completed ? "✓" : "○"
+            span = task_type.humanize
+            
       / Estimated time remaining (optional)
       - if progress > 0 && progress < 100
-        .has-text-centered.mt-2
-          p.is-size-7.has-text-grey-dark
+        .text-center.mt-2
+          p.text-xs.text-gray-600
             | Processing... This may take a few minutes

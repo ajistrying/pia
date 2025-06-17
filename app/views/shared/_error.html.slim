@@ -1,12 +1,12 @@
 = turbo_frame_tag "workspace-content"
-  .notification.is-danger
-    .content
-      h3.title.is-5 Error Loading Workspace
+  .p-4.bg-red-100.border.border-red-400.text-red-700.rounded-md
+    .space-y-4
+      h3.text-lg.font-semibold Error Loading Workspace
       
       p
         = error || "An unexpected error occurred while loading the workspace data."
       
-      .buttons.mt-4
+      .flex.gap-2.mt-4
         = link_to "Retry", company_workspace_path(@workspace), 
-          class: "button is-danger",
+          class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors",
           data: { turbo_frame: "_top" } 

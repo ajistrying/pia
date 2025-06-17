@@ -1,59 +1,60 @@
 / AI-Generated Insights Section
-.box.mb-5
-  .content
-    h2.title.is-4.mb-4 AI-Generated Insights
-    p.subtitle.is-6.has-text-grey-dark Key insights derived from all available data
+.bg-white.shadow-sm.rounded-lg.p-6.mb-6
+  .space-y-4
+    h2.text-xl.font-bold.mb-4 AI-Generated Insights
+    p.text-sm.text-gray-600 Key insights derived from all available data
     
     - if workspace.processing_status == 'completed' && workspace.sec_filings.any? && workspace.financial_statements.any?
       / Show insights when data is available and processed
       / Financial Performance
-      .mb-5
-        h3.title.is-5.mb-3 Financial Performance
-        .content
-          p #{workspace.company_name} financial data analysis will be generated based on processed SEC filings, financial statements, and key ratios. This section will provide insights on revenue trends, profitability metrics, and operational efficiency indicators.
+      .mb-6
+        h3.text-lg.font-semibold.mb-3 Financial Performance
+        .space-y-2
+          p.text-gray-700 #{workspace.company_name} financial data analysis will be generated based on processed SEC filings, financial statements, and key ratios. This section will provide insights on revenue trends, profitability metrics, and operational efficiency indicators.
       
       / Strategic Initiatives  
-      .mb-5
-        h3.title.is-5.mb-3 Strategic Initiatives
-        .content
-          p Analysis of strategic initiatives will be derived from earnings call transcripts and recent SEC filings, highlighting key business developments, expansion plans, and management guidance.
+      .mb-6
+        h3.text-lg.font-semibold.mb-3 Strategic Initiatives
+        .space-y-2
+          p.text-gray-700 Analysis of strategic initiatives will be derived from earnings call transcripts and recent SEC filings, highlighting key business developments, expansion plans, and management guidance.
       
       / Risk Factors
-      .mb-5
-        h3.title.is-5.mb-3 Risk Factors
-        .content
-          p Risk assessment will be based on SEC filing disclosures, market analysis, and recent news sentiment to identify potential challenges and regulatory concerns.
+      .mb-6
+        h3.text-lg.font-semibold.mb-3 Risk Factors
+        .space-y-2
+          p.text-gray-700 Risk assessment will be based on SEC filing disclosures, market analysis, and recent news sentiment to identify potential challenges and regulatory concerns.
       
       / Outlook
-      .mb-5
-        h3.title.is-5.mb-3 Outlook
-        .content
+      .mb-6
+        h3.text-lg.font-semibold.mb-3 Outlook
+        .space-y-2
           - if workspace.analyst_ratings.any?
             - avg_target = workspace.analyst_ratings.where.not(price_target: nil).average(:price_target)
             - if avg_target
-              p Based on available analyst consensus and financial data, analysts project continued performance with an average price target of #{number_to_currency(avg_target, precision: 0)}.
+              p.text-gray-700 Based on available analyst consensus and financial data, analysts project continued performance with an average price target of #{number_to_currency(avg_target, precision: 0)}.
             - else
-              p Forward-looking analysis will be provided based on financial trends, analyst coverage, and market conditions.
+              p.text-gray-700 Forward-looking analysis will be provided based on financial trends, analyst coverage, and market conditions.
           - else
-            p Forward-looking analysis will be provided based on financial trends and market conditions once sufficient data is processed.
+            p.text-gray-700 Forward-looking analysis will be provided based on financial trends and market conditions once sufficient data is processed.
     
     - else
       / Show placeholder when data is not yet processed
-      .content.has-text-grey.has-text-centered.p-5
-        span.icon.is-large.has-text-grey-lighter
-          i.fas.fa-lightbulb.fa-3x
-        p.title.is-5.has-text-grey-light AI Insights Coming Soon
-        p.subtitle.is-6.has-text-grey 
+      .text-gray-500.text-center.py-8.px-4
+        .flex.justify-center.mb-4
+          .w-16.h-16.text-gray-300
+            i.fas.fa-lightbulb.text-4xl
+        p.text-lg.font-medium.text-gray-400.mb-2 AI Insights Coming Soon
+        p.text-sm.text-gray-500 
           - if workspace.processing_status == 'processing' || workspace.last_update_started_at.present?
             | Processing financial data to generate intelligent insights...
           - else
             | Insights will be generated once financial data is processed and analyzed
 
 / Analyst Ratings Section
-.box.mb-5
-  .content
-    h2.title.is-4.mb-4 Analyst Ratings
-    p.subtitle.is-6.has-text-grey-dark Recent analyst ratings and price targets
+.bg-white.shadow-sm.rounded-lg.p-6.mb-6
+  .space-y-4
+    h2.text-xl.font-bold.mb-4 Analyst Ratings
+    p.text-sm.text-gray-600 Recent analyst ratings and price targets
     
     - analyst_ratings = workspace.analyst_ratings.order(created_date: :desc)
     - if analyst_ratings.any?
@@ -64,168 +65,157 @@
       - consensus_rating = buy_ratings > (total_ratings / 2) ? 'Buy' : 'Hold'
       
       / Consensus Summary
-      .columns.is-vcentered.mb-5
-        .column.is-one-quarter
-          .has-text-centered
-            p.title.is-2.has-text-weight-bold = consensus_rating
-            p.subtitle.is-6.has-text-grey Consensus Rating
-        .column.is-one-quarter
-          .has-text-centered
+      .grid.grid-cols-2.lg:grid-cols-4.gap-4.mb-6
+        .text-center
+          .bg-gray-50.rounded-lg.p-4
+            p.text-2xl.font-bold.text-gray-900 = consensus_rating
+            p.text-sm.text-gray-600 Consensus Rating
+        .text-center
+          .bg-gray-50.rounded-lg.p-4
             - if avg_price_target
-              p.title.is-2.has-text-weight-bold = number_to_currency(avg_price_target, precision: 0)
-              p.subtitle.is-6.has-text-grey Avg. Price Target
+              p.text-2xl.font-bold.text-gray-900 = number_to_currency(avg_price_target, precision: 0)
+              p.text-sm.text-gray-600 Avg. Price Target
             - else
-              p.title.is-2.has-text-grey-light --
-              p.subtitle.is-6.has-text-grey Avg. Price Target
-        .column.is-one-quarter
-          .has-text-centered
-            p.title.is-2.has-text-grey-light --
-            p.subtitle.is-6.has-text-grey Upside Potential
-        .column.is-one-quarter
-          .has-text-centered
-            p.title.is-2.has-text-weight-bold #{buy_ratings} / #{total_ratings}
-            p.subtitle.is-6.has-text-grey Buy Ratings
+              p.text-2xl.font-bold.text-gray-300 --
+              p.text-sm.text-gray-600 Avg. Price Target
+        .text-center
+          .bg-gray-50.rounded-lg.p-4
+            p.text-2xl.font-bold.text-gray-300 --
+            p.text-sm.text-gray-600 Upside Potential
+        .text-center
+          .bg-gray-50.rounded-lg.p-4
+            p.text-2xl.font-bold.text-gray-900 #{buy_ratings} / #{total_ratings}
+            p.text-sm.text-gray-600 Buy Ratings
       
       / Recent Analyst Actions
-      .content
-        h3.title.is-5.mb-3 Recent Analyst Actions
+      .space-y-4
+        h3.text-lg.font-semibold.mb-3 Recent Analyst Actions
         
-        .columns.is-multiline
+        .grid.grid-cols-1.lg:grid-cols-2.gap-4
           - analyst_ratings.limit(4).each do |rating|
-            .column.is-half
-              .box.is-light
-                .level.mb-2
-                  .level-left
-                    .level-item
-                      .content
-                        p.has-text-weight-bold = rating.rating_agency || rating.analyst_name || 'Unknown'
-                        p.is-size-7.has-text-grey = rating.created_date&.strftime("%Y-%m-%d") || 'Date unknown'
-                  .level-right
-                    .level-item
-                      - if rating.rating
-                        - rating_class = ['Buy', 'Strong Buy', 'Overweight'].include?(rating.rating) ? 'is-success' : 'is-warning'
-                        span.tag.is-rounded class=rating_class = rating.rating
-                      - else
-                        span.tag.is-light.is-rounded N/A
-                .content.is-small
-                  - if rating.price_target
-                    p.has-text-weight-bold = number_to_currency(rating.price_target, precision: 0)
-                    p.is-size-7.has-text-grey Price Target
+            .bg-gray-50.rounded-lg.p-4
+              .flex.justify-between.items-start.mb-3
+                .flex-1
+                  .space-y-1
+                    p.font-semibold.text-gray-900 = rating.rating_agency || rating.analyst_name || 'Unknown'
+                    p.text-xs.text-gray-500 = rating.created_date&.strftime("%Y-%m-%d") || 'Date unknown'
+                .flex-shrink-0
+                  - if rating.rating
+                    - rating_class = ['Buy', 'Strong Buy', 'Overweight'].include?(rating.rating) ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    span.px-2.py-1.text-xs.font-medium.rounded-full class=rating_class = rating.rating
                   - else
-                    p.has-text-weight-bold --
-                    p.is-size-7.has-text-grey No Price Target
+                    span.px-2.py-1.text-xs.font-medium.bg-gray-100.text-gray-600.rounded-full N/A
+              .space-y-1
+                - if rating.price_target
+                  p.font-bold.text-gray-900 = number_to_currency(rating.price_target, precision: 0)
+                  p.text-xs.text-gray-500 Price Target
+                - else
+                  p.font-bold.text-gray-400 --
+                  p.text-xs.text-gray-500 No Price Target
         
-        .has-text-centered.mt-4
-          button.button.is-outlined.is-primary View All Analyst Ratings
+        .text-center.mt-6
+          button.px-4.py-2.border.border-blue-600.text-blue-600.rounded-md.hover:bg-blue-50.transition-colors View All Analyst Ratings
     
     - else
       / Empty state when no analyst ratings
-      .content.has-text-grey.has-text-centered.p-5
-        span.icon.is-large.has-text-grey-lighter
-          i.fas.fa-chart-line.fa-3x
-        p.title.is-5.has-text-grey-light No Analyst Ratings Available
-        p.subtitle.is-6.has-text-grey Analyst ratings will appear here once data is processed
+      .text-gray-500.text-center.py-8.px-4
+        .flex.justify-center.mb-4
+          .w-16.h-16.text-gray-300
+            i.fas.fa-chart-line.text-4xl
+        p.text-lg.font-medium.text-gray-400.mb-2 No Analyst Ratings Available
+        p.text-sm.text-gray-500 Analyst ratings will appear here once data is processed
 
 / Latest Updates Row
-.columns.is-multiline.mb-5
+.grid.grid-cols-1.lg:grid-cols-3.gap-6.mb-6
   / Latest SEC Filing
-  .column.is-one-third
-    - latest_filing = workspace.sec_filings.order(filing_date: :desc).first
-    .box
-      .content
-        .level.mb-3
-          .level-left
-            .level-item
-              span.icon.is-medium.has-text-success
-                i.fas.fa-file-alt
-          .level-right
-            .level-item
-              - if latest_filing&.summary&.present?
-                span.tag.is-success.is-small ✓ Analyzed
-              - else
-                span.tag.is-warning.is-small ⏳ Processing
+  - latest_filing = workspace.sec_filings.order(filing_date: :desc).first
+  .bg-white.shadow-sm.rounded-lg.p-6
+    .space-y-4
+      .flex.justify-between.items-start.mb-3
+        .flex.items-center.gap-2
+          .w-8.h-8.text-green-600
+            i.fas.fa-file-alt.text-lg
+        .flex-shrink-0
+          - if latest_filing&.summary&.present?
+            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
+          - else
+            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
         
-        - if latest_filing
-          h3.title.is-6.mb-2 Latest SEC Filing
-          p.subtitle.is-7.has-text-grey-dark = latest_filing.form_type
-          p.is-size-7.has-text-grey Filed on #{latest_filing.filing_date&.strftime("%B %d, %Y") || 'Unknown date'}
-          
-          .content.mt-3
-            - if latest_filing.summary.present?
-              p = truncate(latest_filing.summary, length: 150)
-            - else
-              p.has-text-grey Processing filing content...
-        - else
-          h3.title.is-6.mb-2 Latest SEC Filing
-          p.subtitle.is-7.has-text-grey-light No filings available
-          .content.mt-3
-            p.has-text-grey SEC filings will appear here once processed
+      - if latest_filing
+        h3.text-base.font-semibold.mb-2 Latest SEC Filing
+        p.text-sm.font-medium.text-gray-700 = latest_filing.form_type
+        p.text-xs.text-gray-500 Filed on #{latest_filing.filing_date&.strftime("%B %d, %Y") || 'Unknown date'}
+        
+        .space-y-2.mt-3
+          - if latest_filing.summary.present?
+            p.text-sm.text-gray-700 = truncate(latest_filing.summary, length: 150)
+          - else
+            p.text-sm.text-gray-500 Processing filing content...
+      - else
+        h3.text-base.font-semibold.mb-2 Latest SEC Filing
+        p.text-sm.text-gray-400 No filings available
+        .space-y-2.mt-3
+          p.text-sm.text-gray-500 SEC filings will appear here once processed
   
   / Latest Earnings Call
-  .column.is-one-third
-    - latest_call = workspace.earnings_calls.order(year: :desc, quarter: :desc).first
-    .box
-      .content
-        .level.mb-3
-          .level-left
-            .level-item
-              span.icon.is-medium.has-text-warning
-                i.fas.fa-comments
-          .level-right
-            .level-item
-              - if latest_call&.summary&.present?
-                span.tag.is-success.is-small ✓ Analyzed
-              - else
-                span.tag.is-warning.is-small ⏳ Processing
+  - latest_call = workspace.earnings_calls.order(year: :desc, quarter: :desc).first
+  .bg-white.shadow-sm.rounded-lg.p-6
+    .space-y-4
+      .flex.justify-between.items-start.mb-3
+        .flex.items-center.gap-2
+          .w-8.h-8.text-yellow-600
+            i.fas.fa-comments.text-lg
+        .flex-shrink-0
+          - if latest_call&.summary&.present?
+            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
+          - else
+            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
         
-        - if latest_call
-          h3.title.is-6.mb-2 Latest Earnings Call
-          p.subtitle.is-7.has-text-grey-dark Q#{latest_call.quarter} #{latest_call.year} Earnings Call
-          
-          .content.mt-3
-            - if latest_call.summary.present?
-              p.is-italic = truncate(latest_call.summary, length: 150)
-            - else
-              p.has-text-grey Processing earnings call transcript...
-        - else
-          h3.title.is-6.mb-2 Latest Earnings Call
-          p.subtitle.is-7.has-text-grey-light No earnings calls available
-          .content.mt-3
-            p.has-text-grey Earnings calls will appear here once processed
+      - if latest_call
+        h3.text-base.font-semibold.mb-2 Latest Earnings Call
+        p.text-sm.font-medium.text-gray-700 Q#{latest_call.quarter} #{latest_call.year} Earnings Call
+        
+        .space-y-2.mt-3
+          - if latest_call.summary.present?
+            p.text-sm.text-gray-700.italic = truncate(latest_call.summary, length: 150)
+          - else
+            p.text-sm.text-gray-500 Processing earnings call transcript...
+      - else
+        h3.text-base.font-semibold.mb-2 Latest Earnings Call
+        p.text-sm.text-gray-400 No earnings calls available
+        .space-y-2.mt-3
+          p.text-sm.text-gray-500 Earnings calls will appear here once processed
   
   / Latest News
-  .column.is-one-third
-    - latest_news = workspace.news_pieces.order(published_date: :desc).first
-    .box
-      .content
-        .level.mb-3
-          .level-left
-            .level-item
-              span.icon.is-medium.has-text-info
-                i.fas.fa-newspaper
-          .level-right
-            .level-item
-              - if latest_news&.summary&.present?
-                span.tag.is-success.is-small ✓ Analyzed
-              - else
-                span.tag.is-warning.is-small ⏳ Processing
+  - latest_news = workspace.news_pieces.order(published_date: :desc).first
+  .bg-white.shadow-sm.rounded-lg.p-6
+    .space-y-4
+      .flex.justify-between.items-start.mb-3
+        .flex.items-center.gap-2
+          .w-8.h-8.text-blue-600
+            i.fas.fa-newspaper.text-lg
+        .flex-shrink-0
+          - if latest_news&.summary&.present?
+            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
+          - else
+            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
         
-        - if latest_news
-          h3.title.is-6.mb-2 Latest News
-          p.subtitle.is-7.has-text-grey-dark = truncate(latest_news.title, length: 50) if latest_news.title
-          p.is-size-7.has-text-grey 
-            - if latest_news.published_date
-              = latest_news.published_date.strftime("%B %d, %Y")
-            - if latest_news.author.present?
-              |  • #{latest_news.author}
-          
-          .content.mt-3
-            - if latest_news.summary.present?
-              p = truncate(latest_news.summary, length: 150)
-            - else
-              p.has-text-grey Processing news content...
-        - else
-          h3.title.is-6.mb-2 Latest News
-          p.subtitle.is-7.has-text-grey-light No news available
-          .content.mt-3
-            p.has-text-grey News articles will appear here once processed
+      - if latest_news
+        h3.text-base.font-semibold.mb-2 Latest News
+        p.text-sm.font-medium.text-gray-700 = truncate(latest_news.title, length: 50) if latest_news.title
+        p.text-xs.text-gray-500 
+          - if latest_news.published_date
+            = latest_news.published_date.strftime("%B %d, %Y")
+          - if latest_news.author.present?
+            |  • #{latest_news.author}
+        
+        .space-y-2.mt-3
+          - if latest_news.summary.present?
+            p.text-sm.text-gray-700 = truncate(latest_news.summary, length: 150)
+          - else
+            p.text-sm.text-gray-500 Processing news content...
+      - else
+        h3.text-base.font-semibold.mb-2 Latest News
+        p.text-sm.text-gray-400 No news available
+        .space-y-2.mt-3
+          p.text-sm.text-gray-500 News articles will appear here once processed

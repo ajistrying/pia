@@ -1,7 +1,7 @@
-.container
-  .section
+.container.mx-auto.px-4
+  .py-8
     .mb-3
-      = link_to "← Back to Search", root_path, class: "has-text-grey is-size-7"
+      = link_to "← Back to Search", root_path, class: "text-gray-500 text-sm"
     
     = turbo_stream_from "workspace_#{@workspace.id}"
     

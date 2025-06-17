@@ -1,23 +1,23 @@
 = turbo_stream.update "search-results" do
-  .container
+  .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
     - if @error.present?
-      .notification.is-danger.is-light.mt-4
+      .p-4.bg-red-100.border.border-red-400.text-red-700.rounded-md.mt-4
         p = @error
     - if @companies.any?
-      .box
-        .content
-          h4.title.is-5 Search Results
-          div.is-flex-direction-column
+      .bg-white.shadow-sm.rounded-lg.p-6
+        .space-y-4
+          h4.text-lg.font-semibold Search Results
+          .flex.flex-col.space-y-2
             - @companies.each do |company|
-              div.is-flex.is-justify-content-space-between.is-align-items-center.mt-2
-                div.is-flex-direction-row
-                  span.mr-2 = company["symbol"]
-                  span.has-text-weight-normal = company["name"]
+              .flex.justify-between.items-center.py-2.border-b.border-gray-100.last:border-b-0
+                .flex.flex-col.sm:flex-row.sm:items-center.gap-2
+                  span.font-semibold.text-gray-900 = company["symbol"]
+                  span.text-gray-600 = company["name"]
                 div
                   - if @existing_workspaces[company["symbol"]]
-                    span.has-text-weight-normal Workspace already exists
+                    span.text-gray-500 Workspace already exists
                   - else
-                    = button_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "button is-small is-primary", data: { turbo: false }
+                    = button_to "Analyze", company_workspaces_path(company_symbol: company["symbol"], company_name: company["name"]), method: :post, class: "px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors", data: { turbo: false }
     - elsif @query.present?
-      .notification.is-warning.is-light.mt-4
+      .p-4.bg-yellow-100.border.border-yellow-400.text-yellow-700.rounded-md.mt-4
         p No companies found matching "#{@query}" 

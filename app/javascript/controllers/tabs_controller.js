@@ -13,12 +13,14 @@ export default class extends Controller {
     
     // Remove active class from all tabs
     this.tabTargets.forEach(tab => {
-      tab.classList.remove("is-active")
+      tab.classList.remove("border-blue-500", "text-blue-600")
+      tab.classList.add("border-transparent", "text-gray-500")
     })
     
     // Add active class to clicked tab
-    const clickedTab = event.currentTarget.closest("li")
-    clickedTab.classList.add("is-active")
+    const clickedTab = event.currentTarget
+    clickedTab.classList.remove("border-transparent", "text-gray-500")
+    clickedTab.classList.add("border-blue-500", "text-blue-600")
     
     // Get tab content name
     const targetContent = clickedTab.dataset.tabContent
@@ -34,11 +36,11 @@ export default class extends Controller {
     const contentContainer = document.querySelector("#tab-content-container")
     if (contentContainer) {
       contentContainer.innerHTML = `
-        <div class="box has-text-centered p-6">
-          <div class="is-size-1 has-text-grey-lighter mb-4">
+        <div class="bg-white shadow-sm rounded-lg p-6 text-center">
+          <div class="text-4xl text-gray-300 mb-4">
             <i class="fas fa-spinner fa-spin"></i>
           </div>
-          <p class="title is-5 has-text-grey-light">Loading...</p>
+          <p class="text-lg font-medium text-gray-400">Loading...</p>
         </div>
       `
     }
@@ -72,12 +74,12 @@ export default class extends Controller {
     const contentContainer = document.querySelector("#tab-content-container")
     if (contentContainer) {
       contentContainer.innerHTML = `
-        <div class="box has-text-centered p-6">
-          <div class="is-size-1 has-text-danger mb-4">
+        <div class="bg-white shadow-sm rounded-lg p-6 text-center">
+          <div class="text-4xl text-red-500 mb-4">
             <i class="fas fa-exclamation-triangle"></i>
           </div>
-          <p class="title is-5 has-text-grey-light">Error Loading Content</p>
-          <p class="subtitle is-6 has-text-grey">Please try again or refresh the page</p>
+          <p class="text-lg font-medium text-gray-400">Error Loading Content</p>
+          <p class="text-base text-gray-500">Please try again or refresh the page</p>
         </div>
       `
     }
