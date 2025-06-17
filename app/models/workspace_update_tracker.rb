@@ -3,7 +3,6 @@ class WorkspaceUpdateTracker
   
   TASK_TYPES = %w[
     sec_filings
-    earnings_calls
     financial_statements
     key_ratios
     enterprise_value

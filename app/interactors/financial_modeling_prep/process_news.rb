@@ -4,6 +4,13 @@ class FinancialModelingPrep::ProcessNews < FinancialModelingPrep::BaseInteractor
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
     
+    # Check if we've processed recently (within 1 day for incremental updates)
+    last_processed = workspace.news_pieces.maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "News for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     # Fetch news data
     fetch_fmp_articles(workspace)
     fetch_general_news(workspace)

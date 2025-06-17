@@ -14,7 +14,7 @@ class ParallelWorkspaceUpdateJob < ApplicationJob
     # Launch all processing jobs in parallel
     jobs = [
       ProcessSecFilingsJob.perform_later(workspace_id),
-      ProcessEarningsCallsJob.perform_later(workspace_id), 
+      # ProcessEarningsCallsJob.perform_later(workspace_id), # Commented out - requires higher API tier
       ProcessFinancialStatementsJob.perform_later(workspace_id),
       ProcessKeyRatiosJob.perform_later(workspace_id),
       ProcessEnterpriseValueJob.perform_later(workspace_id),

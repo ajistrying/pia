@@ -70,6 +70,9 @@ gem 'nokogiri'
 
 gem "openai", "~> 0.6.0"
 
+# Markdown processing
+gem "redcarpet", "~> 3.6"
+
 # HTML templating
 gem "slim"
 

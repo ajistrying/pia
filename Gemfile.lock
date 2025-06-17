@@ -285,6 +285,7 @@ GEM
     rdoc (6.14.0)
       erb
       psych (>= 4.0.0)
+    redcarpet (3.6.1)
     redis (5.4.0)
       redis-client (>= 0.22.0)
     redis-client (0.24.0)
@@ -404,6 +405,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.1.5, >= 7.1.5.1)
   rails_icons
+  redcarpet (~> 3.6)
   redis (>= 4.0.1)
   rspec-rails (~> 7.1.1)
   ruby_llm

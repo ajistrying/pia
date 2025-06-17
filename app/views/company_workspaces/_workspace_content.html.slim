@@ -2,43 +2,78 @@
   / Progress indicator (will be replaced when processing starts)
   #progress-indicator
   
-  / Company Overview
-  .hero.is-light.mb-5
-    .hero-body.py-4
-      .container
-        .level
-          .level-left
-            .level-item
-              .content
-                h1.title.is-4.mb-1 = workspace.company_name
-                p.subtitle.is-6.has-text-grey-dark Symbol: #{workspace.company_symbol}
-          .level-right
-            .level-item
-              .content.has-text-right
-                - if workspace.last_successful_update.present?
-                  p.is-size-7.has-text-grey
-                    | Last Updated: #{workspace.last_successful_update.strftime("%b %d, %Y at %I:%M %p")}
-                - if workspace.processing_status == 'completed'
-                  span.tag.is-success ✓ Up to date
-                - elsif workspace.last_update_started_at.present?
-                  span.tag.is-warning ⏳ Updating
-                - else
-                  span.tag.is-light Initialized
+  / Company Header
+  .box.mb-5
+    .level.mb-4
+      .level-left
+        .level-item
+          .content
+            h1.title.is-3.mb-1 = workspace.company_name
+            p.subtitle.is-5.has-text-grey-dark = workspace.company_symbol
+      .level-right
+        .level-item
+          .content.has-text-right
+            - if workspace.processing_status == 'completed'
+              span.tag.is-success ✓ Analysis Complete
+            - elsif workspace.last_update_started_at.present?
+              span.tag.is-warning ⏳ Processing Data
+            - else
+              span.tag.is-light Ready for Analysis
+    
+    / Key Metrics Row - will be populated from financial data when available
+    - latest_financial = workspace.financial_statements.where(statement_type: 'income_statement').order(year: :desc, quarter: :desc).first
+    - revenue_growth_ratio = workspace.key_ratios.find_by(ratio_name: 'revenueGrowth')
+    - net_margin_ratio = workspace.key_ratios.find_by(ratio_name: 'netProfitMargin')
+    - pe_ratio = workspace.key_ratios.find_by(ratio_name: 'peRatio')
+    
+    .columns.is-gapless.is-mobile
+      .column.has-text-centered.px-4
+        - if revenue_growth_ratio&.ratio_value
+          - growth_value = revenue_growth_ratio.ratio_value
+          - growth_class = growth_value >= 0 ? 'has-text-success' : 'has-text-danger'
+          p.title.is-5 class=growth_class
+            = growth_value >= 0 ? '+' : ''
+            = number_to_percentage(growth_value, precision: 1)
+        - else
+          p.title.is-5.has-text-grey-light --
+        p.subtitle.is-7.has-text-grey Revenue Growth %
+        p.is-size-7.has-text-grey Year-over-year revenue growth rate
+      
+      .column.has-text-centered.px-4
+        - if net_margin_ratio&.ratio_value
+          p.title.is-5.has-text-success = number_to_percentage(net_margin_ratio.ratio_value, precision: 1)
+        - else
+          p.title.is-5.has-text-grey-light --
+        p.subtitle.is-7.has-text-grey Net Income Margin
+        p.is-size-7.has-text-grey Profit margins from operations
+      
+      .column.has-text-centered.px-4
+        - if pe_ratio&.ratio_value
+          - pe_value = pe_ratio.ratio_value
+          - pe_class = pe_value <= 25 ? 'has-text-success' : 'has-text-warning'
+          p.title.is-5 class=pe_class = number_with_precision(pe_value, precision: 1)
+        - else
+          p.title.is-5.has-text-grey-light --
+        p.subtitle.is-7.has-text-grey P/E Ratio
+        p.is-size-7.has-text-grey Price-to-earnings valuation
 
-  / Financial Data Sections
-  .workspace-data
-    .columns.is-multiline
-      .column.is-half
-        = render partial: "company_workspaces/sec_filings", locals: { workspace: workspace }
-      .column.is-half  
-        = render partial: "company_workspaces/earnings_calls", locals: { workspace: workspace }
-      .column.is-half
-        = render partial: "company_workspaces/financial_statements", locals: { workspace: workspace }
-      .column.is-half
-        = render partial: "company_workspaces/key_ratios", locals: { workspace: workspace }
-      .column.is-half
-        = render partial: "company_workspaces/enterprise_value", locals: { workspace: workspace }
-      .column.is-half
-        = render partial: "company_workspaces/analyst_ratings", locals: { workspace: workspace }
-      .column.is-full
-        = render partial: "company_workspaces/news", locals: { workspace: workspace } 
+    / Navigation Tabs
+    .tabs.is-boxed.mb-0 data-controller="tabs" data-tabs-workspace-id-value="#{workspace.id}"
+      ul
+        li.is-active data-tabs-target="tab" data-tab-content="overview"
+          a data-action="click->tabs#switch"
+            span Overview
+        li data-tabs-target="tab" data-tab-content="sec-filings"
+          a data-action="click->tabs#switch"
+            span SEC Filings
+        li data-tabs-target="tab" data-tab-content="financial-ratios"
+          a data-action="click->tabs#switch"
+            span Financial Ratios
+        li data-tabs-target="tab" data-tab-content="news-sentiment"
+          a data-action="click->tabs#switch"
+            span News & Sentiment
+
+  / Dynamic Tab Content Container
+  #tab-content-container
+
+ 

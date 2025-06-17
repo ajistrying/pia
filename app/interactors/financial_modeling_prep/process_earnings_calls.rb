@@ -3,6 +3,14 @@ class FinancialModelingPrep::ProcessEarningsCalls < FinancialModelingPrep::BaseI
 
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
+    
+    # Check if we've processed recently (within 1 day for incremental updates)
+    last_processed = workspace.earnings_calls.maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "Earnings calls for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     start_year = 3.years.ago.year
     start_quarter = 1
     end_year = Date.current.year

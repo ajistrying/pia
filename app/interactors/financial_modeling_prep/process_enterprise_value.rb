@@ -4,6 +4,13 @@ class FinancialModelingPrep::ProcessEnterpriseValue < FinancialModelingPrep::Bas
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
     
+    # Check if we've processed recently (within 1 day for incremental updates)
+    last_processed = workspace.key_ratios.where(ratio_name: 'Enterprise Value').maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "Enterprise values for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     # Fetch enterprise value data
     fetch_enterprise_values(workspace)
     

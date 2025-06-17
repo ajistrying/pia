@@ -4,6 +4,13 @@ class FinancialModelingPrep::ProcessAnalystRatings < FinancialModelingPrep::Base
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
     
+    # Check if we've processed recently (within 1 day for incremental updates)
+    last_processed = workspace.analyst_ratings.maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "Analyst ratings for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     # Fetch analyst ratings data
     fetch_grades(workspace)
     fetch_price_target_summary(workspace)

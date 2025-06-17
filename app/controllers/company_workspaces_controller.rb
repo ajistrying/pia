@@ -15,12 +15,30 @@ class CompanyWorkspacesController < ApplicationController
   end
 
   def workspace_content
-    # This action is called by Turbo Frame to load the actual content
-    if @workspace.up_to_date?
-      render partial: "workspace_content", locals: { workspace: @workspace }
+    @tab = params[:tab] || 'overview'
+    
+    # Handle AJAX tab requests
+    if request.xhr?
+      case @tab
+      when 'overview'
+        render partial: 'tab_overview', locals: { workspace: @workspace }
+      when 'sec-filings'
+        render partial: 'tab_sec_filings', locals: { workspace: @workspace }
+      when 'financial-ratios'
+        render partial: 'key_ratios', locals: { workspace: @workspace }
+      when 'news-sentiment'
+        render partial: 'tab_news_sentiment', locals: { workspace: @workspace }
+      else
+        render partial: 'tab_overview', locals: { workspace: @workspace }
+      end
     else
-      # Show loading while job processes
-      render partial: "company_workspaces/loading_skeleton_component"
+      # This action is called by Turbo Frame to load the actual content
+      if @workspace.up_to_date?
+        render partial: "workspace_content", locals: { workspace: @workspace }
+      else
+        # Show loading while job processes
+        render partial: "company_workspaces/loading_skeleton_component"
+      end
     end
   end
 

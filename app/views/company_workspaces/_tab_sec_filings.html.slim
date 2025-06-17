@@ -1,0 +1,55 @@
+.box
+  .content
+    h2.title.is-4.mb-4
+      span.icon.is-small.mr-2
+        i.fas.fa-file-alt
+      | SEC Filings
+    p.subtitle.is-6.has-text-grey-dark Complete regulatory filing history
+    
+    - if workspace.sec_filings.any?
+      - filings_by_year = workspace.sec_filings.order(filing_date: :desc).group_by { |filing| filing.filing_date&.strftime("%Y") || "Unknown Date" }
+      
+      - filings_by_year.each_with_index do |(year, filings), index|
+        .card.mb-3 data-controller="drawer"
+          header.card-header data-action="click->drawer#toggle"
+            .card-header-title
+              span.icon.mr-2
+                i.fas.fa-calendar-alt.has-text-info
+              span = year
+              span.tag.is-info.is-light.ml-2 = pluralize(filings.count, 'filing')
+            .card-header-icon
+              span.icon data-drawer-target="icon"
+                i.fas.fa-chevron-down
+          
+          .card-content.drawer-content data-drawer-target="content" class="#{'is-hidden' unless index == 0}"
+            - filings.each do |filing|
+              .box.p-4.mb-3.is-light
+                .level.is-mobile.mb-3
+                  .level-left
+                    .level-item
+                      .content
+                        p.title.is-6.mb-1 = filing.form_type
+                        p.subtitle.is-7.has-text-grey = filing.filing_date&.strftime("%B %d, %Y") || 'Unknown date'
+                  .level-right
+                    .level-item
+                      - if filing.summary.present?
+                        span.tag.is-success ✓ Analyzed
+                      - else
+                        span.tag.is-warning ⏳ Processing
+                
+                - if filing.summary.present?
+                  .content
+                    = markdown_to_html(filing.summary)
+                - else
+                  .content.has-text-grey
+                    p Processing filing content. Summary will be available once analysis is complete.
+                
+                - if filing.sec_link.present?
+                  .content.mt-3
+                    = link_to "View Original Filing", filing.sec_link, target: "_blank", class: "button is-outlined is-small"
+    - else
+      .content.has-text-grey.has-text-centered.p-5
+        span.icon.is-large.has-text-grey-lighter
+          i.fas.fa-file-alt.fa-3x
+        p.title.is-5.has-text-grey-light No SEC Filings Available
+        p.subtitle.is-6.has-text-grey SEC filings will appear here once data is processed

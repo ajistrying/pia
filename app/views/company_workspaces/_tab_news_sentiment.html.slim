@@ -1,0 +1,49 @@
+.box
+  .content
+    h2.title.is-4.mb-4
+      span.icon.is-small.mr-2
+        i.fas.fa-newspaper
+      | News & Sentiment
+    p.subtitle.is-6.has-text-grey-dark Latest news and market sentiment analysis
+    
+    - if workspace.news_pieces.any?
+      - workspace.news_pieces.order(published_date: :desc).each do |news|
+        .box.p-4.mb-3
+          .level.is-mobile.mb-3
+            .level-left
+              .level-item
+                .content
+                  p.title.is-6.mb-1
+                    - if news.url.present?
+                      = link_to news.title, news.url, target: "_blank", class: "has-text-dark"
+                    - else
+                      = news.title
+                  p.subtitle.is-7.has-text-grey
+                    - if news.published_date
+                      = news.published_date.strftime("%B %d, %Y")
+                    - if news.author.present?
+                      |  • #{news.author}
+            .level-right
+              .level-item
+                - if news.summary.present?
+                  span.tag.is-success ✓ Analyzed
+                - else
+                  span.tag.is-warning ⏳ Processing
+          
+          - if news.summary.present?
+            .content
+              p = news.summary
+          - else
+            .content.has-text-grey
+              p Processing news content. Summary will be available once analysis is complete.
+          
+          - if news.url.present?
+            .content.mt-3
+              = link_to "Read Full Article", news.url, target: "_blank", class: "button is-outlined is-small"
+    
+    - else
+      .content.has-text-grey.has-text-centered.p-5
+        span.icon.is-large.has-text-grey-lighter
+          i.fas.fa-newspaper.fa-3x
+        p.title.is-5.has-text-grey-light No News Available
+        p.subtitle.is-6.has-text-grey News articles will appear here once data is processed

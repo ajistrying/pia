@@ -4,6 +4,13 @@ class FinancialModelingPrep::ProcessFinancialStatements < FinancialModelingPrep:
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
     
+    # Check if we've processed recently (within 1 day for incremental updates)
+    last_processed = workspace.financial_statements.maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "Financial statements for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     # Fetch financial statements data (last 3 years)
     fetch_income_statements(workspace)
     fetch_balance_sheets(workspace)
@@ -15,16 +22,30 @@ class FinancialModelingPrep::ProcessFinancialStatements < FinancialModelingPrep:
   private
 
   def fetch_income_statements(workspace)
-    context.url = "https://financialmodelingprep.com/stable/income-statement?symbol=#{workspace.company_symbol}"
+    url = "https://financialmodelingprep.com/stable/income-statement?symbol=#{workspace.company_symbol}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}"
     
-    # Call API directly
-    response = Faraday.get("#{context.url}?apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
-    context.response_result = JSON.parse(response.body)
+    # Call API directly with proper error handling
+    response = Faraday.get(url)
+
+    Rails.logger.info "Response from income statements API: #{response.body}"
     
-    return unless context.response_result.is_a?(Array) && !context.response_result.empty?
+    # Check if response is valid JSON before parsing
+    if response.body.strip.start_with?('{', '[')
+      begin
+        response_result = JSON.parse(response.body)
+      rescue JSON::ParserError => e
+        Rails.logger.error "JSON parsing error for income statements API: #{e.message}. Response body: #{response.body[0..200]}"
+        return
+      end
+    else
+      Rails.logger.warn "Non-JSON response from income statements API: #{response.body[0..200]}"
+      return
+    end
+    
+    return unless response_result.is_a?(Array) && !response_result.empty?
     
     # Process last 3 years of annual data
-    context.response_result.first(3).each do |statement|
+    response_result.first(3).each do |statement|
       next if FinancialStatement.exists?(
         company_workspace: workspace,
         statement_type: 'income_statement',
@@ -54,16 +75,29 @@ class FinancialModelingPrep::ProcessFinancialStatements < FinancialModelingPrep:
   def fetch_balance_sheets(workspace)
     sleep 0.5 # Rate limiting
     
-    context.url = "https://financialmodelingprep.com/stable/balance-sheet-statement?symbol=#{workspace.company_symbol}"
+    url = "https://financialmodelingprep.com/stable/balance-sheet-statement?symbol=#{workspace.company_symbol}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}"
     
-    # Call API directly
-    response = Faraday.get("#{context.url}?apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
-    context.response_result = JSON.parse(response.body)
+    # Call API directly with proper error handling
+    response = Faraday.get(url)
+
+    Rails.logger.info "Response from balance sheets API: #{response.body}"
+    # Check if response is valid JSON before parsing
+    if response.body.strip.start_with?('{', '[')
+      begin
+        response_result = JSON.parse(response.body)
+      rescue JSON::ParserError => e
+        Rails.logger.error "JSON parsing error for balance sheets API: #{e.message}. Response body: #{response.body[0..200]}"
+        return
+      end
+    else
+      Rails.logger.warn "Non-JSON response from balance sheets API: #{response.body[0..200]}"
+      return
+    end
     
-    return unless context.response_result.is_a?(Array) && !context.response_result.empty?
+    return unless response_result.is_a?(Array) && !response_result.empty?
     
     # Process last 3 years of annual data
-    context.response_result.first(3).each do |statement|
+    response_result.first(3).each do |statement|
       next if FinancialStatement.exists?(
         company_workspace: workspace,
         statement_type: 'balance_sheet',
@@ -91,16 +125,29 @@ class FinancialModelingPrep::ProcessFinancialStatements < FinancialModelingPrep:
   def fetch_cash_flow_statements(workspace)
     sleep 0.5 # Rate limiting
     
-    context.url = "https://financialmodelingprep.com/stable/cash-flow-statement?symbol=#{workspace.company_symbol}"
+    url = "https://financialmodelingprep.com/stable/cash-flow-statement?symbol=#{workspace.company_symbol}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}"
     
-    # Call API directly
-    response = Faraday.get("#{context.url}?apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
-    context.response_result = JSON.parse(response.body)
+    # Call API directly with proper error handling
+    response = Faraday.get(url)
+
+    Rails.logger.info "Response from cash flow statements API: #{response.body}"
+    # Check if response is valid JSON before parsing
+    if response.body.strip.start_with?('{', '[')
+      begin
+        response_result = JSON.parse(response.body)
+      rescue JSON::ParserError => e
+        Rails.logger.error "JSON parsing error for cash flow statements API: #{e.message}. Response body: #{response.body[0..200]}"
+        return
+      end
+    else
+      Rails.logger.warn "Non-JSON response from cash flow statements API: #{response.body[0..200]}"
+      return
+    end
     
-    return unless context.response_result.is_a?(Array) && !context.response_result.empty?
+    return unless response_result.is_a?(Array) && !response_result.empty?
     
     # Process last 3 years of annual data
-    context.response_result.first(3).each do |statement|
+    response_result.first(3).each do |statement|
       next if FinancialStatement.exists?(
         company_workspace: workspace,
         statement_type: 'cash_flow_statement',

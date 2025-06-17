@@ -1,0 +1,138 @@
+.box
+  .content
+    h2.title.is-4.mb-4
+      span.icon.is-small.mr-2
+        i.fas.fa-calculator
+      | Financial Ratios
+    p.subtitle.is-6.has-text-grey-dark Comprehensive financial ratio analysis
+    
+    - key_ratios = workspace.key_ratios.group_by(&:ratio_name)
+    - if key_ratios.any?
+      .columns.is-multiline.mt-4
+        / Profitability
+        .column.is-one-third
+          .box.is-light
+            .content
+              h4.title.is-5.mb-3.has-text-success
+                span.icon.is-small.mr-2
+                  i.fas.fa-chart-line
+                | Profitability
+              .field.is-grouped.is-grouped-multiline
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Gross Margin
+                    - if key_ratios['grossProfitMargin']&.first&.ratio_value
+                      span.tag.is-success.has-text-weight-bold = number_to_percentage(key_ratios['grossProfitMargin'].first.ratio_value, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Operating Margin
+                    - if key_ratios['operatingMargin']&.first&.ratio_value
+                      span.tag.is-success.has-text-weight-bold = number_to_percentage(key_ratios['operatingMargin'].first.ratio_value, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Net Profit Margin
+                    - if key_ratios['netProfitMargin']&.first&.ratio_value
+                      span.tag.is-success.has-text-weight-bold = number_to_percentage(key_ratios['netProfitMargin'].first.ratio_value, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+        
+        / Liquidity
+        .column.is-one-third
+          .box.is-light
+            .content
+              h4.title.is-5.mb-3.has-text-info
+                span.icon.is-small.mr-2
+                  i.fas.fa-tint
+                | Liquidity
+              .field.is-grouped.is-grouped-multiline
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Current Ratio
+                    - if key_ratios['currentRatio']&.first&.ratio_value
+                      span.tag.is-info.has-text-weight-bold = number_with_precision(key_ratios['currentRatio'].first.ratio_value, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Quick Ratio
+                    - if key_ratios['quickRatio']&.first&.ratio_value
+                      span.tag.is-info.has-text-weight-bold = number_with_precision(key_ratios['quickRatio'].first.ratio_value, precision: 1)
+                    - else  
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Cash Ratio
+                    - if key_ratios['cashRatio']&.first&.ratio_value
+                      span.tag.is-info.has-text-weight-bold = number_with_precision(key_ratios['cashRatio'].first.ratio_value, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+        
+        / Growth
+        .column.is-one-third
+          .box.is-light
+            .content
+              h4.title.is-5.mb-3.has-text-warning
+                span.icon.is-small.mr-2
+                  i.fas.fa-trending-up
+                | Growth
+              .field.is-grouped.is-grouped-multiline
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Revenue Growth (YoY)
+                    - if key_ratios['revenueGrowth']&.first&.ratio_value
+                      - growth_val = key_ratios['revenueGrowth'].first.ratio_value
+                      - growth_class = growth_val >= 0 ? 'is-success' : 'is-danger'
+                      span.tag class=growth_class class="has-text-weight-bold"
+                        = growth_val >= 0 ? '+' : ''
+                        = number_to_percentage(growth_val, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light EPS Growth (YoY)
+                    - if key_ratios['epsGrowth']&.first&.ratio_value
+                      - eps_growth = key_ratios['epsGrowth'].first.ratio_value  
+                      - eps_class = eps_growth >= 0 ? 'is-success' : 'is-danger'
+                      span.tag class=eps_class class="has-text-weight-bold"
+                        = eps_growth >= 0 ? '+' : ''
+                        = number_to_percentage(eps_growth, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+                .control
+                  .tags.has-addons
+                    span.tag.is-light Free Cash Flow Growth
+                    - if key_ratios['freeCashFlowGrowth']&.first&.ratio_value
+                      - fcf_growth = key_ratios['freeCashFlowGrowth'].first.ratio_value
+                      - fcf_class = fcf_growth >= 0 ? 'is-success' : 'is-danger'
+                      span.tag class=fcf_class class="has-text-weight-bold"
+                        = fcf_growth >= 0 ? '+' : ''
+                        = number_to_percentage(fcf_growth, precision: 1)
+                    - else
+                      span.tag.is-light.has-text-weight-bold --
+      
+      / Additional Ratios
+      - if key_ratios.keys.any? { |key| !['grossProfitMargin', 'operatingMargin', 'netProfitMargin', 'currentRatio', 'quickRatio', 'cashRatio', 'revenueGrowth', 'epsGrowth', 'freeCashFlowGrowth'].include?(key) }
+        .box.mt-5
+          .content
+            h4.title.is-5.mb-3 Additional Financial Ratios
+            .columns.is-multiline
+              - key_ratios.each do |ratio_name, ratios|
+                - unless ['grossProfitMargin', 'operatingMargin', 'netProfitMargin', 'currentRatio', 'quickRatio', 'cashRatio', 'revenueGrowth', 'epsGrowth', 'freeCashFlowGrowth'].include?(ratio_name)
+                  .column.is-one-quarter
+                    .tags.has-addons
+                      span.tag.is-light = ratio_name.humanize
+                      - if ratios.first&.ratio_value
+                        span.tag.is-primary = number_with_precision(ratios.first.ratio_value, precision: 2)
+                      - else
+                        span.tag.is-light --
+    
+    - else
+      .content.has-text-grey.has-text-centered.p-5
+        span.icon.is-large.has-text-grey-lighter
+          i.fas.fa-calculator.fa-3x
+        p.title.is-5.has-text-grey-light No Financial Ratios Available
+        p.subtitle.is-6.has-text-grey Financial ratios will appear here once data is processed

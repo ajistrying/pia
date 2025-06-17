@@ -4,6 +4,15 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
   def call
     workspace = CompanyWorkspace.find(context.company_workspace_id)
     
+    # Check if we've processed recently (within 1 day for incremental updates)
+    # Exclude enterprise value ratios as they're handled by a separate processor
+    enterprise_value_ratios = ['Enterprise Value', 'Market Capitalization', 'Add Total Debt', 'Minus Cash And Cash Equivalents', 'Number Of Shares', 'Stock Price']
+    last_processed = workspace.key_ratios.where.not(ratio_name: enterprise_value_ratios).maximum(:updated_at)
+    if last_processed && last_processed > 1.day.ago
+      Rails.logger.info "Key ratios for #{workspace.company_symbol} are up to date"
+      return
+    end
+    
     # Fetch financial ratios data
     fetch_annual_ratios(workspace)
     fetch_ttm_ratios(workspace)
@@ -14,10 +23,10 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
   private
 
   def fetch_annual_ratios(workspace)
-    context.url = "https://financialmodelingprep.com/stable/ratios/#{workspace.company_symbol}"
+    context.url = "https://financialmodelingprep.com/stable/ratios?symbol=#{workspace.company_symbol}"
     
     # Call API directly
-    response = Faraday.get("#{context.url}?apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
+    response = Faraday.get("#{context.url}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
     context.response_result = JSON.parse(response.body)
     
     return unless context.response_result.is_a?(Array) && !context.response_result.empty?
@@ -36,10 +45,10 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
   def fetch_ttm_ratios(workspace)
     sleep 0.5 # Rate limiting
     
-    context.url = "https://financialmodelingprep.com/stable/ratios-ttm/#{workspace.company_symbol}"
+    context.url = "https://financialmodelingprep.com/stable/ratios-ttm?symbol=#{workspace.company_symbol}"
     
     # Call API directly
-    response = Faraday.get("#{context.url}?apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
+    response = Faraday.get("#{context.url}&apikey=#{ENV['FINANCIAL_MODELING_PREP_API_KEY']}")
     context.response_result = JSON.parse(response.body)
     
     return unless context.response_result.is_a?(Array) && !context.response_result.empty?
@@ -56,7 +65,7 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
 
   def store_ratios(workspace, ratio_data, is_ttm)
     # Extract key ratios from the response
-    ratios_to_store = {
+    base_ratios_mapping = {
       'currentRatio' => 'Current Ratio',
       'quickRatio' => 'Quick Ratio',
       'cashRatio' => 'Cash Ratio',
@@ -76,11 +85,11 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
       'netIncomePerEBT' => 'Net Income per EBT',
       'ebtPerEbit' => 'EBT per EBIT',
       'ebitPerRevenue' => 'EBIT per Revenue',
-      'debtRatio' => 'Debt Ratio',
-      'debtEquityRatio' => 'Debt to Equity Ratio',
-      'longTermDebtToCapitalization' => 'Long Term Debt to Capitalization',
+      'debtToAssetsRatio' => 'Debt Ratio',
+      'debtToEquityRatio' => 'Debt to Equity Ratio',
+      'longTermDebtToCapitalRatio' => 'Long Term Debt to Capitalization',
       'totalDebtToCapitalization' => 'Total Debt to Capitalization',
-      'interestCoverage' => 'Interest Coverage',
+      'interestCoverageRatio' => 'Interest Coverage',
       'cashFlowToDebtRatio' => 'Cash Flow to Debt Ratio',
       'companyEquityMultiplier' => 'Equity Multiplier',
       'receivablesTurnover' => 'Receivables Turnover',
@@ -112,6 +121,20 @@ class FinancialModelingPrep::ProcessKeyRatios < FinancialModelingPrep::BaseInter
       'enterpriseValueMultiple' => 'Enterprise Value Multiple',
       'priceFairValue' => 'Price Fair Value'
     }
+
+    # For TTM data, we need to check for fields with "TTM" suffix
+    # For annual data, we use the base field names
+    ratios_to_store = if is_ttm
+      # Create mapping for TTM field names
+      ttm_mapping = {}
+      base_ratios_mapping.each do |base_key, display_name|
+        ttm_key = "#{base_key}TTM"
+        ttm_mapping[ttm_key] = display_name
+      end
+      ttm_mapping
+    else
+      base_ratios_mapping
+    end
 
     period = is_ttm ? 'TTM' : ratio_data['date']
     year = is_ttm ? Date.current.year : Date.parse(ratio_data['date']).year
