@@ -21,3 +21,6 @@ application.register("remote-modal", RemoteModalController);
 
 import AccordionController from "./accordion_controller";
 application.register("accordion", AccordionController);
+
+import TooltipController from "./tooltip_controller";
+application.register("tooltip", TooltipController);

@@ -9,8 +9,14 @@
         .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
           .flex.items-start.justify-between
             .flex-1
-              h3.text-lg.font-semibold.text-gray-900.mb-3
-                = ratio_info[:ratio].ratio_name.gsub(' Margin', ' Margin').gsub(' Return', ' Return')
+              h3.text-lg.font-semibold.text-gray-900.mb-3.relative.group
+                .flex.items-center.space-x-2
+                  span = ratio_info[:ratio].ratio_name.gsub(' Margin', ' Margin').gsub(' Return', ' Return')
+                  .relative data-controller="tooltip"
+                    = icon "circle-help", library: "lucide", class: "w-4 h-4 text-gray-600 hover:text-gray-600 cursor-help", data: { action: "mouseenter->tooltip#show mouseleave->tooltip#hide" }
+                    .absolute.z-50.px-3.py-2.text-sm.text-white.bg-gray-900.rounded-lg.shadow-lg.opacity-0.pointer-events-none.transition-opacity.duration-200.w-80.bottom-full.left-1/2.transform.-translate-x-1/2.mb-2 data-tooltip-target="content"
+                      = KeyRatio.ratio_explanation(ratio_info[:ratio].ratio_name)
+                      .absolute.top-full.left-1/2.transform.-translate-x-1/2.w-0.h-0.border-l-4.border-r-4.border-t-4.border-transparent.border-t-gray-900
               
               - if ratio_info[:change_data]
                 .mb-4
@@ -51,8 +57,14 @@
         .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
           .flex.items-start.justify-between
             .flex-1
-              h3.text-lg.font-semibold.text-gray-900.mb-3
-                = ratio_info[:ratio].ratio_name
+              h3.text-lg.font-semibold.text-gray-900.mb-3.relative.group
+                .flex.items-center.space-x-2
+                  span = ratio_info[:ratio].ratio_name
+                  .relative data-controller="tooltip"
+                    = icon "circle-help", library: "lucide", class: "w-4 h-4 text-gray-600 hover:text-gray-600 cursor-help", data: { action: "mouseenter->tooltip#show mouseleave->tooltip#hide" }
+                    .absolute.z-50.px-3.py-2.text-sm.text-white.bg-gray-900.rounded-lg.shadow-lg.opacity-0.pointer-events-none.transition-opacity.duration-200.w-80.bottom-full.left-1/2.transform.-translate-x-1/2.mb-2 data-tooltip-target="content"
+                      = KeyRatio.ratio_explanation(ratio_info[:ratio].ratio_name)
+                      .absolute.top-full.left-1/2.transform.-translate-x-1/2.w-0.h-0.border-l-4.border-r-4.border-t-4.border-transparent.border-t-gray-900
               
               - if ratio_info[:change_data]
                 .mb-4
@@ -93,8 +105,14 @@
         .ratio-card.bg-white.border.border-gray-200.rounded-lg.p-6.hover:shadow-md.transition-shadow.duration-200
           .flex.items-start.justify-between
             .flex-1
-              h3.text-lg.font-semibold.text-gray-900.mb-3
-                = ratio_info[:ratio].ratio_name
+              h3.text-lg.font-semibold.text-gray-900.mb-3.relative.group
+                .flex.items-center.space-x-2
+                  span = ratio_info[:ratio].ratio_name
+                  .relative data-controller="tooltip"
+                    = icon "circle-help", library: "lucide", class: "w-4 h-4 text-gray-600 hover:text-gray-600 cursor-help", data: { action: "mouseenter->tooltip#show mouseleave->tooltip#hide" }
+                    .absolute.z-50.px-3.py-2.text-sm.text-white.bg-gray-900.rounded-lg.shadow-lg.opacity-0.pointer-events-none.transition-opacity.duration-200.w-80.bottom-full.left-1/2.transform.-translate-x-1/2.mb-2 data-tooltip-target="content"
+                      = KeyRatio.ratio_explanation(ratio_info[:ratio].ratio_name)
+                      .absolute.top-full.left-1/2.transform.-translate-x-1/2.w-0.h-0.border-l-4.border-r-4.border-t-4.border-transparent.border-t-gray-900
               
               - if ratio_info[:change_data]
                 .mb-4

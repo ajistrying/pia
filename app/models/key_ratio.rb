@@ -176,6 +176,34 @@ class KeyRatio < ApplicationRecord
     end
   end
 
+  def self.ratio_explanation(ratio_name)
+    explanations = {
+      # Profitability Ratios
+      'Gross Profit Margin' => 'Percentage of revenue remaining after deducting cost of goods sold. Higher values indicate better production efficiency.',
+      'Operating Profit Margin' => 'Percentage of revenue remaining after operating expenses. Shows operational efficiency and cost control.',
+      'Net Profit Margin' => 'Percentage of revenue that becomes profit after all expenses. Measures overall profitability.',
+      'Return on Assets' => 'How effectively assets generate profit. Calculated as net income divided by total assets.',
+      'Return on Equity' => 'Returns generated on shareholders\' equity. Shows how well the company uses shareholder investments.',
+      'Return on Capital Employed' => 'Efficiency of capital utilization. Measures returns on both debt and equity capital.',
+      
+      # Liquidity Ratios
+      'Current Ratio' => 'Ability to pay short-term debts. Calculated as current assets divided by current liabilities.',
+      'Quick Ratio' => 'Immediate liquidity without inventory. More conservative measure than current ratio.',
+      'Cash Ratio' => 'Most conservative liquidity measure using only cash and equivalents vs. current liabilities.',
+      'Operating Cash Flow Sales Ratio' => 'Cash generated from operations as percentage of sales. Shows quality of earnings.',
+      
+      # Solvency Ratios
+      'Debt Ratio' => 'Proportion of assets financed by debt. Lower values indicate less financial risk.',
+      'Debt to Equity Ratio' => 'Financial leverage comparing total debt to shareholders\' equity. Measures capital structure.',
+      'Interest Coverage' => 'Ability to pay interest on debt. Higher values indicate better debt servicing capability.',
+      'Cash Flow to Debt Ratio' => 'Operating cash flow relative to total debt. Shows ability to service debt from operations.',
+      'Long Term Debt to Capitalization' => 'Long-term debt as percentage of total capital. Measures long-term financial structure.',
+      'Total Debt to Capitalization' => 'All debt as percentage of total capital. Comprehensive measure of leverage.'
+    }
+    
+    explanations[ratio_name] || 'Financial metric used for company analysis.'
+  end
+
   def formatted_value
     return 'N/A' unless ratio_value
     
