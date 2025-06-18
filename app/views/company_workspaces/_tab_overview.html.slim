@@ -1,221 +1,118 @@
-/ AI-Generated Insights Section
-.bg-white.shadow-sm.rounded-lg.p-6.mb-6
-  .space-y-4
-    h2.text-xl.font-bold.mb-4 AI-Generated Insights
-    p.text-sm.text-gray-600 Key insights derived from all available data
+/ Key Metrics Summary
+- if workspace.processing_status == 'completed' && (workspace.analyst_ratings.any? || workspace.financial_statements.any?)
+  / Market Consensus Card
+  .bg-white.shadow-sm.rounded-lg.p-6.mb-6
+    h2.text-xl.font-bold.mb-4 Market Consensus
+   
     
-    - if workspace.processing_status == 'completed' && workspace.sec_filings.any? && workspace.financial_statements.any?
-      / Show insights when data is available and processed
-      / Financial Performance
-      .mb-6
-        h3.text-lg.font-semibold.mb-3 Financial Performance
-        .space-y-2
-          p.text-gray-700 #{workspace.company_name} financial data analysis will be generated based on processed SEC filings, financial statements, and key ratios. This section will provide insights on revenue trends, profitability metrics, and operational efficiency indicators.
+    - if workspace.analyst_ratings.any?
+      - consensus_data = calculate_analyst_consensus(workspace)
+      p.text-sm.text-gray-600.mb-6 As of #{consensus_data[:date_range][:end].strftime("%B %d, %Y")}
       
-      / Strategic Initiatives  
-      .mb-6
-        h3.text-lg.font-semibold.mb-3 Strategic Initiatives
-        .space-y-2
-          p.text-gray-700 Analysis of strategic initiatives will be derived from earnings call transcripts and recent SEC filings, highlighting key business developments, expansion plans, and management guidance.
-      
-      / Risk Factors
-      .mb-6
-        h3.text-lg.font-semibold.mb-3 Risk Factors
-        .space-y-2
-          p.text-gray-700 Risk assessment will be based on SEC filing disclosures, market analysis, and recent news sentiment to identify potential challenges and regulatory concerns.
-      
-      / Outlook
-      .mb-6
-        h3.text-lg.font-semibold.mb-3 Outlook
-        .space-y-2
-          - if workspace.analyst_ratings.any?
-            - avg_target = workspace.analyst_ratings.where.not(price_target: nil).average(:price_target)
-            - if avg_target
-              p.text-gray-700 Based on available analyst consensus and financial data, analysts project continued performance with an average price target of #{number_to_currency(avg_target, precision: 0)}.
+      .space-y-8
+        / Main Consensus Metrics
+        .grid.grid-cols-2.lg:grid-cols-4.gap-4
+          / Consensus Rating
+          .bg-gray-50.rounded-lg.p-4.text-center
+            .text-sm.text-gray-600.mb-1 Consensus
+            .text-2xl.font-bold class=consensus_rating_color(consensus_data[:consensus_rating]) = consensus_data[:consensus_rating]
+          
+          / Average Price Target
+          .bg-gray-50.rounded-lg.p-4.text-center
+            .text-sm.text-gray-600.mb-1 Price Target
+            - if consensus_data[:avg_price_target]
+              .text-2xl.font-bold.text-gray-900 = number_to_currency(consensus_data[:avg_price_target], precision: 0)
             - else
-              p.text-gray-700 Forward-looking analysis will be provided based on financial trends, analyst coverage, and market conditions.
-          - else
-            p.text-gray-700 Forward-looking analysis will be provided based on financial trends and market conditions once sufficient data is processed.
-    
-    - else
-      / Show placeholder when data is not yet processed
-      .text-gray-500.text-center.py-8.px-4
-        .flex.justify-center.mb-4
-          .w-16.h-16.text-gray-300
-            i.fas.fa-lightbulb.text-4xl
-        p.text-lg.font-medium.text-gray-400.mb-2 AI Insights Coming Soon
-        p.text-sm.text-gray-500 
-          - if workspace.processing_status == 'processing' || workspace.last_update_started_at.present?
-            | Processing financial data to generate intelligent insights...
-          - else
-            | Insights will be generated once financial data is processed and analyzed
-
-/ Analyst Ratings Section
-.bg-white.shadow-sm.rounded-lg.p-6.mb-6
-  .space-y-4
-    h2.text-xl.font-bold.mb-4 Analyst Ratings
-    p.text-sm.text-gray-600 Recent analyst ratings and price targets
-    
-    - analyst_ratings = workspace.analyst_ratings.order(created_date: :desc)
-    - if analyst_ratings.any?
-      / Calculate consensus data
-      - total_ratings = analyst_ratings.count
-      - buy_ratings = analyst_ratings.where(rating: ['Buy', 'Strong Buy', 'Overweight']).count
-      - avg_price_target = analyst_ratings.where.not(price_target: nil).average(:price_target)
-      - consensus_rating = buy_ratings > (total_ratings / 2) ? 'Buy' : 'Hold'
-      
-      / Consensus Summary
-      .grid.grid-cols-2.lg:grid-cols-4.gap-4.mb-6
-        .text-center
-          .bg-gray-50.rounded-lg.p-4
-            p.text-2xl.font-bold.text-gray-900 = consensus_rating
-            p.text-sm.text-gray-600 Consensus Rating
-        .text-center
-          .bg-gray-50.rounded-lg.p-4
-            - if avg_price_target
-              p.text-2xl.font-bold.text-gray-900 = number_to_currency(avg_price_target, precision: 0)
-              p.text-sm.text-gray-600 Avg. Price Target
-            - else
-              p.text-2xl.font-bold.text-gray-300 --
-              p.text-sm.text-gray-600 Avg. Price Target
-        .text-center
-          .bg-gray-50.rounded-lg.p-4
-            p.text-2xl.font-bold.text-gray-300 --
-            p.text-sm.text-gray-600 Upside Potential
-        .text-center
-          .bg-gray-50.rounded-lg.p-4
-            p.text-2xl.font-bold.text-gray-900 #{buy_ratings} / #{total_ratings}
-            p.text-sm.text-gray-600 Buy Ratings
-      
-      / Recent Analyst Actions
-      .space-y-4
-        h3.text-lg.font-semibold.mb-3 Recent Analyst Actions
+              .text-2xl.font-bold.text-gray-400 --
+          
+          / Coverage
+          .bg-gray-50.rounded-lg.p-4.text-center
+            .text-sm.text-gray-600.mb-1 Coverage
+            .text-2xl.font-bold.text-gray-900 = consensus_data[:total_ratings]
+            .text-xs.text-gray-500 Analysts
+          
+          / Buy Ratio
+          .bg-gray-50.rounded-lg.p-4.text-center
+            .text-sm.text-gray-600.mb-1 Buy Ratio
+            .text-2xl.font-bold.text-gray-900 = "#{((consensus_data[:buy_ratings].to_f / consensus_data[:total_ratings]) * 100).round}%"
         
-        .grid.grid-cols-1.lg:grid-cols-2.gap-4
-          - analyst_ratings.limit(4).each do |rating|
+        / Rating Distribution
+        .space-y-3
+          h3.text-lg.font-semibold.text-gray-900 Rating Distribution
+          .grid.grid-cols-3.gap-4
+            / Buy Ratings
             .bg-gray-50.rounded-lg.p-4
-              .flex.justify-between.items-start.mb-3
-                .flex-1
-                  .space-y-1
-                    p.font-semibold.text-gray-900 = rating.rating_agency || rating.analyst_name || 'Unknown'
-                    p.text-xs.text-gray-500 = rating.created_date&.strftime("%Y-%m-%d") || 'Date unknown'
-                .flex-shrink-0
-                  - if rating.rating
-                    - rating_class = ['Buy', 'Strong Buy', 'Overweight'].include?(rating.rating) ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    span.px-2.py-1.text-xs.font-medium.rounded-full class=rating_class = rating.rating
-                  - else
-                    span.px-2.py-1.text-xs.font-medium.bg-gray-100.text-gray-600.rounded-full N/A
-              .space-y-1
-                - if rating.price_target
-                  p.font-bold.text-gray-900 = number_to_currency(rating.price_target, precision: 0)
-                  p.text-xs.text-gray-500 Price Target
-                - else
-                  p.font-bold.text-gray-400 --
-                  p.text-xs.text-gray-500 No Price Target
-        
-        .text-center.mt-6
-          button.px-4.py-2.border.border-blue-600.text-blue-600.rounded-md.hover:bg-blue-50.transition-colors View All Analyst Ratings
-    
-    - else
-      / Empty state when no analyst ratings
-      .text-gray-500.text-center.py-8.px-4
-        .flex.justify-center.mb-4
-          .w-16.h-16.text-gray-300
-            i.fas.fa-chart-line.text-4xl
-        p.text-lg.font-medium.text-gray-400.mb-2 No Analyst Ratings Available
-        p.text-sm.text-gray-500 Analyst ratings will appear here once data is processed
+              .flex.justify-between.items-center
+                span.text-sm.text-gray-600 Buy
+                span.font-bold.text-green-600 = consensus_data[:buy_ratings]
+              .mt-2.bg-gray-200.rounded-full.h-2
+                .bg-green-600.rounded-full.h-2 style="width: #{(consensus_data[:buy_ratings].to_f / consensus_data[:total_ratings] * 100).round}%"
+            
+            / Hold Ratings
+            .bg-gray-50.rounded-lg.p-4
+              .flex.justify-between.items-center
+                span.text-sm.text-gray-600 Hold
+                span.font-bold.text-yellow-600 = consensus_data[:hold_ratings]
+              .mt-2.bg-gray-200.rounded-full.h-2
+                .bg-yellow-600.rounded-full.h-2 style="width: #{(consensus_data[:hold_ratings].to_f / consensus_data[:total_ratings] * 100).round}%"
+            
+            / Sell Ratings
+            .bg-gray-50.rounded-lg.p-4
+              .flex.justify-between.items-center
+                span.text-sm.text-gray-600 Sell
+                span.font-bold.text-red-600 = consensus_data[:sell_ratings]
+              .mt-2.bg-gray-200.rounded-full.h-2
+                .bg-red-600.rounded-full.h-2 style="width: #{(consensus_data[:sell_ratings].to_f / consensus_data[:total_ratings] * 100).round}%"
 
-/ Latest Updates Row
-.grid.grid-cols-1.lg:grid-cols-3.gap-6.mb-6
-  / Latest SEC Filing
-  - latest_filing = workspace.sec_filings.order(filing_date: :desc).first
-  .bg-white.shadow-sm.rounded-lg.p-6
-    .space-y-4
-      .flex.justify-between.items-start.mb-3
-        .flex.items-center.gap-2
-          .w-8.h-8.text-green-600
-            i.fas.fa-file-alt.text-lg
-        .flex-shrink-0
-          - if latest_filing&.summary&.present?
-            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
-          - else
-            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
-        
-      - if latest_filing
-        h3.text-base.font-semibold.mb-2 Latest SEC Filing
-        p.text-sm.font-medium.text-gray-700 = latest_filing.form_type
-        p.text-xs.text-gray-500 Filed on #{latest_filing.filing_date&.strftime("%B %d, %Y") || 'Unknown date'}
-        
-        .space-y-2.mt-3
-          - if latest_filing.summary.present?
-            p.text-sm.text-gray-700 = truncate(latest_filing.summary, length: 150)
-          - else
-            p.text-sm.text-gray-500 Processing filing content...
-      - else
-        h3.text-base.font-semibold.mb-2 Latest SEC Filing
-        p.text-sm.text-gray-400 No filings available
-        .space-y-2.mt-3
-          p.text-sm.text-gray-500 SEC filings will appear here once processed
-  
-  / Latest Earnings Call
-  - latest_call = workspace.earnings_calls.order(year: :desc, quarter: :desc).first
-  .bg-white.shadow-sm.rounded-lg.p-6
-    .space-y-4
-      .flex.justify-between.items-start.mb-3
-        .flex.items-center.gap-2
-          .w-8.h-8.text-yellow-600
-            i.fas.fa-comments.text-lg
-        .flex-shrink-0
-          - if latest_call&.summary&.present?
-            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
-          - else
-            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
-        
-      - if latest_call
-        h3.text-base.font-semibold.mb-2 Latest Earnings Call
-        p.text-sm.font-medium.text-gray-700 Q#{latest_call.quarter} #{latest_call.year} Earnings Call
-        
-        .space-y-2.mt-3
-          - if latest_call.summary.present?
-            p.text-sm.text-gray-700.italic = truncate(latest_call.summary, length: 150)
-          - else
-            p.text-sm.text-gray-500 Processing earnings call transcript...
-      - else
-        h3.text-base.font-semibold.mb-2 Latest Earnings Call
-        p.text-sm.text-gray-400 No earnings calls available
-        .space-y-2.mt-3
-          p.text-sm.text-gray-500 Earnings calls will appear here once processed
-  
-  / Latest News
-  - latest_news = workspace.news_pieces.order(published_date: :desc).first
-  .bg-white.shadow-sm.rounded-lg.p-6
-    .space-y-4
-      .flex.justify-between.items-start.mb-3
-        .flex.items-center.gap-2
-          .w-8.h-8.text-blue-600
-            i.fas.fa-newspaper.text-lg
-        .flex-shrink-0
-          - if latest_news&.summary&.present?
-            span.px-2.py-1.text-xs.font-medium.bg-green-100.text-green-800.rounded-full ✓ Analyzed
-          - else
-            span.px-2.py-1.text-xs.font-medium.bg-yellow-100.text-yellow-800.rounded-full ⏳ Processing
-        
-      - if latest_news
-        h3.text-base.font-semibold.mb-2 Latest News
-        p.text-sm.font-medium.text-gray-700 = truncate(latest_news.title, length: 50) if latest_news.title
-        p.text-xs.text-gray-500 
-          - if latest_news.published_date
-            = latest_news.published_date.strftime("%B %d, %Y")
-          - if latest_news.author.present?
-            |  • #{latest_news.author}
-        
-        .space-y-2.mt-3
-          - if latest_news.summary.present?
-            p.text-sm.text-gray-700 = truncate(latest_news.summary, length: 150)
-          - else
-            p.text-sm.text-gray-500 Processing news content...
-      - else
-        h3.text-base.font-semibold.mb-2 Latest News
-        p.text-sm.text-gray-400 No news available
-        .space-y-2.mt-3
-          p.text-sm.text-gray-500 News articles will appear here once processed
+  / Financial Performance Card
+  - if workspace.financial_statements.any?
+    .bg-white.shadow-sm.rounded-lg.p-6.mb-6
+      h2.text-xl.font-bold.mb-4 Financial Performance
+      p.text-sm.text-gray-600.mb-6 As of #{workspace.financial_statements.order(year: :desc, period: :desc).first.period}
+      
+      .grid.grid-cols-1.lg:grid-cols-3.gap-8
+        / Income Statement Metrics
+        .space-y-4
+          h3.text-lg.font-semibold.text-gray-900.pb-2.border-b.border-gray-200 Income Statement
+          .space-y-3
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Revenue
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["income_statement"].first.revenue)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Gross Profit
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["income_statement"].first.gross_profit)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Operating Income
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["income_statement"].first.operating_income)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Net Income
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["income_statement"].first.net_income)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 EPS
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["income_statement"].first.eps, unit: 'currency')
+
+        / Balance Sheet Metrics
+        .space-y-4
+          h3.text-lg.font-semibold.text-gray-900.pb-2.border-b.border-gray-200 Balance Sheet
+          .space-y-3
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Total Assets
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["balance_sheet"].first.total_assets)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Total Debt
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["balance_sheet"].first.total_debt)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Shareholders Equity
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["balance_sheet"].first.shareholders_equity)
+
+        / Cash Flow Metrics
+        .space-y-4
+          h3.text-lg.font-semibold.text-gray-900.pb-2.border-b.border-gray-200 Cash Flow
+          .space-y-3
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Operating Cash Flow
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["cash_flow_statement"].first.operating_cash_flow)
+            .flex.justify-between.items-center
+              span.text-sm.text-gray-600 Free Cash Flow
+              span.font-semibold.text-gray-900 = format_financial_number(workspace.financial_statements.recent_set["cash_flow_statement"].first.free_cash_flow)
+

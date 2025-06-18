@@ -1,21 +1,10 @@
 / Financial Statements Section
 = turbo_frame_tag 'financial_statements_content' do
-  #financial-statements-section.px-4.py-6
+  #financial-statements-section
     .container
       
       / Header with Refresh Button
-      .flex.justify-between.items-center.mb-8.p-6.bg-gradient-to-r.from-purple-50.to-blue-50.rounded-xl.border.border-purple-100.shadow-sm
-        .flex.items-center.space-x-4
-          .flex.items-center.justify-center.w-12.h-12.bg-gradient-to-br.from-purple-500.to-blue-600.rounded-xl.shadow-lg
-            = icon "activity", library: "lucide", class: "w-6 h-6 text-white"
-          .space-y-1
-            h2.text-2xl.font-bold.text-gray-900 Financial Statements
-            p.text-sm.text-gray-600
-              span Comprehensive financial data and analytics
-        .flex-shrink-0
-          = button_to refresh_financial_statements_company_workspace_path(workspace), method: :post, class: "flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5", form: { data: { turbo_frame: "workspace-content" } } do
-            = icon "arrow-right", library: "lucide", class: "w-4 h-4"
-            span Refresh Data
+      = render Workspace::RefreshDataComponent.new(link_path: refresh_financial_statements_company_workspace_path(workspace), icon: "activity", title: "Financial Statements", description: "Comprehensive financial data and analytics")
       
       - if workspace.financial_statements.any?
         - active_tab = local_assigns[:active_tab] || params[:statement_tab] || 'income'
@@ -24,13 +13,13 @@
         .border-b.border-gray-200.mb-8
           .flex.space-x-8
             = link_to financial_statements_tab_company_workspace_path(workspace, statement_tab: 'income'), data: { turbo_frame: 'financial_statements_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'income'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'income'}" do
-              = icon "arrow-up", library: "lucide", class: "w-4 h-4 inline mr-2"
+              = icon "banknote-arrow-up", library: "lucide", class: "w-4 h-4 inline mr-2"
               | Income Statement
             = link_to financial_statements_tab_company_workspace_path(workspace, statement_tab: 'balance'), data: { turbo_frame: 'financial_statements_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'balance'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'balance'}" do
-              = icon "align-center", library: "lucide", class: "w-4 h-4 inline mr-2"
+              = icon "scale", library: "lucide", class: "w-4 h-4 inline mr-2"
               | Balance Sheet
             = link_to financial_statements_tab_company_workspace_path(workspace, statement_tab: 'cashflow'), data: { turbo_frame: 'financial_statements_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'cashflow'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'cashflow'}" do
-              = icon "arrow-right", library: "lucide", class: "w-4 h-4 inline mr-2"
+              = icon "banknote", library: "lucide", class: "w-4 h-4 inline mr-2"
               | Cash Flow
 
         / Tab Content
@@ -142,8 +131,4 @@ css:
   .tab-link {
     cursor: pointer;
     user-select: none;
-  }
-  
-  .tab-link:hover {
-    background-color: rgba(243, 244, 246, 0.5);
   }

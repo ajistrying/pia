@@ -1,58 +1,45 @@
 / Financial Ratio Analysis Section
 = turbo_frame_tag 'financial_ratios_content' do
-  #financial-ratio-analysis-section.px-4.py-6
-    .container
+  .container
+    
+    / Header with Refresh Button
+    = render Workspace::RefreshDataComponent.new(link_path: refresh_financial_ratios_company_workspace_path(workspace), icon: "trending-up", title: "Financial Ratios", description: "Key performance metrics and analysis")  
+    
+    - if workspace.key_ratios.any?
+      - active_tab = local_assigns[:active_tab] || params[:ratio_tab] || 'profitability'
       
-      / Header with Refresh Button
-      .flex.justify-between.items-center.mb-8.p-6.bg-gradient-to-r.from-purple-50.to-blue-50.rounded-xl.border.border-purple-100.shadow-sm
-        .flex.items-center.space-x-4
-          .flex.items-center.justify-center.w-12.h-12.bg-gradient-to-br.from-purple-500.to-blue-600.rounded-xl.shadow-lg
-            = icon "trending-up", library: "lucide", class: "w-6 h-6 text-white"
-          .space-y-1
-            h2.text-2xl.font-bold.text-gray-900 Financial Ratios
-            p.text-sm.text-gray-600
-              span Key performance metrics and analysis
-        .flex-shrink-0
-          = button_to refresh_financial_ratios_company_workspace_path(workspace), method: :post, class: "flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5", form: { data: { turbo_frame: "workspace-content" } } do
-            = icon "arrow-right", library: "lucide", class: "w-4 h-4"
-            span Refresh Data
+      / Tab Navigation
+      .border-b.border-gray-200.mb-8
+        .flex.space-x-8
+          = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'profitability'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'profitability'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'profitability'}" do
+            = icon "trending-up", library: "lucide", class: "w-4 h-4 inline mr-2"
+            | Profitability
+          = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'liquidity'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'liquidity'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'liquidity'}" do
+            = icon "trending-up", library: "lucide", class: "w-4 h-4 inline mr-2"
+            | Liquidity
+          = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'solvency'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'solvency'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'solvency'}" do
+            = icon "chart-line", library: "lucide", class: "w-4 h-4 inline mr-2"
+            | Solvency
       
-      - if workspace.key_ratios.any?
-        - active_tab = local_assigns[:active_tab] || params[:ratio_tab] || 'profitability'
-        
-        / Tab Navigation
-        .border-b.border-gray-200.mb-8
-          .flex.space-x-8
-            = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'profitability'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'profitability'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'profitability'}" do
-              | Profitability
-            = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'liquidity'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'liquidity'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'liquidity'}" do
-              | Liquidity
-            = link_to financial_ratios_tab_company_workspace_path(workspace, ratio_tab: 'solvency'), data: { turbo_frame: 'financial_ratios_content' }, class: "tab-link pb-4 px-1 border-b-2 font-medium text-sm focus:outline-none transition-colors duration-200 #{'border-blue-500 text-blue-600' if active_tab == 'solvency'} #{'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' if active_tab != 'solvency'}" do
-              | Solvency
-        
-        / Tab Content
-        = render partial: 'financial_ratios_tab_content', locals: { workspace: workspace, active_tab: active_tab }
-        
-      - else
-        .text-center.py-16
-          .text-gray-400.mb-6
-            svg.w-16.h-16.mx-auto[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
-              path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"]
-          h3.text-xl.font-semibold.text-gray-900.mb-2 No Financial Ratios Available
-          p.text-gray-500.mb-6 Financial ratio data will appear here once it's been processed for this company.
-          button.inline-flex.items-center.px-4.py-2.border.border-gray-300.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover:bg-gray-50.focus:outline-none.focus:ring-2.focus:ring-offset-2.focus:ring-blue-500.transition-colors.duration-200
-            svg.w-4.h-4.mr-2[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
-              path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"]
-            | Refresh Data
+      / Tab Content
+      = render partial: 'financial_ratios_tab_content', locals: { workspace: workspace, active_tab: active_tab }
+      
+    - else
+      .text-center.py-16
+        .text-gray-400.mb-6
+          svg.w-16.h-16.mx-auto[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
+            path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"]
+        h3.text-xl.font-semibold.text-gray-900.mb-2 No Financial Ratios Available
+        p.text-gray-500.mb-6 Financial ratio data will appear here once it's been processed for this company.
+        button.inline-flex.items-center.px-4.py-2.border.border-gray-300.text-sm.font-medium.rounded-md.text-gray-700.bg-white.hover:bg-gray-50.focus:outline-none.focus:ring-2.focus:ring-offset-2.focus:ring-blue-500.transition-colors.duration-200
+          svg.w-4.h-4.mr-2[fill="none" stroke="currentColor" viewBox="0 0 24 24"]
+            path[stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"]
+          | Refresh Data
 
 css:
   .tab-link {
     cursor: pointer;
     user-select: none;
-  }
-  
-  .tab-link:hover {
-    background-color: rgba(243, 244, 246, 0.5);
   }
   
   .ratio-card {

@@ -1,18 +1,7 @@
 / SEC Filings Section
 #sec-filings-section
     / Header with Refresh Button
-    .flex.justify-between.items-center.mb-8.p-6.bg-gradient-to-r.from-purple-50.to-blue-50.rounded-xl.border.border-purple-100.shadow-sm
-      .flex.items-center.space-x-4
-        .flex.items-center.justify-center.w-12.h-12.bg-gradient-to-br.from-purple-500.to-blue-600.rounded-xl.shadow-lg
-          = icon "archive", library: "lucide", class: "w-6 h-6 text-white"
-        .space-y-1
-          h2.text-2xl.font-bold.text-gray-900 SEC Filings
-          p.text-sm.text-gray-600
-            span Official regulatory documents and reports
-      .flex-shrink-0
-        = button_to refresh_sec_filings_company_workspace_path(workspace), method: :post, class: "flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5", form: { data: { turbo_frame: "workspace-content" } } do
-          = icon "arrow-right", library: "lucide", class: "w-4 h-4"
-          span Refresh Data
+    = render Workspace::RefreshDataComponent.new(link_path: refresh_sec_filings_company_workspace_path(workspace), icon: "archive", title: "SEC Filings", description: "Official regulatory documents and reports")
 
     / Content Area
     .p-4
@@ -23,7 +12,7 @@
             .year-group data-controller="accordion" data-accordion-expanded-value=(index == 0)
               / Year Header - Clickable
               .mb-4
-                button.w-full.text-left.group.focus:outline-none data-action="click->accordion#toggle" data-accordion-target="toggle"
+                button.w-full.text-left.group.focus:outline-none.hover:bg-gray-100.hover:cursor-pointer.rounded-lg.transition-colors.duration-200.border.border-gray-200 data-action="click->accordion#toggle" data-accordion-target="toggle"
                   .flex.items-center.justify-between.p-3.bg-gray-50.hover:bg-gray-100.rounded-lg.transition-colors.duration-200.border.border-gray-200
                     h3.text-lg.font-bold.text-gray-800.group-hover:text-blue-600.transition-colors.duration-200
                       = year

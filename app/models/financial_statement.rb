@@ -35,4 +35,16 @@ class FinancialStatement < ApplicationRecord
   validates :statement_type, inclusion: { in: %w[income_statement balance_sheet cash_flow_statement] }
   validates :period, presence: true
   validates :year, presence: true
+
+  scope :most_recent, -> {
+    select('DISTINCT ON (statement_type) *')
+    .order(Arel.sql('statement_type, year DESC, CASE 
+      WHEN quarter IS NOT NULL THEN quarter 
+      ELSE 0 
+    END DESC'))
+  }
+
+  def self.recent_set
+    most_recent.group_by(&:statement_type)
+  end
 end
