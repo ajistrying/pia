@@ -1,0 +1,13 @@
+= turbo_frame_tag "news-section" do
+  .flex.items-center.justify-center.h-full.py-16
+    .text-center.space-y-4
+      .w-16.h-16.bg-red-100.rounded-full.flex.items-center.justify-center.mx-auto
+        svg.w-8.h-8.text-red-600[viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"]
+          circle[cx="12" cy="12" r="10"]
+          line[x1="15" y1="9" x2="9" y2="15"]
+          line[x1="9" y1="9" x2="15" y2="15"]
+      .text-red-600.font-medium Error loading news data
+      .text-gray-500.text-sm = error if defined?(error)
+      button.px-4.py-2.bg-blue-600.text-white.rounded-lg.hover:bg-blue-700.transition-colors[
+        onclick="location.reload()"
+      ] Retry 
