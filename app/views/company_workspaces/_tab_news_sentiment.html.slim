@@ -13,7 +13,7 @@
             .text-center
               .text-xl.font-bold.text-blue-600 = workspace.news_pieces.count
               .text-gray-500 Articles
-            .text-center  
+            .text-center
               .text-xl.font-bold.text-green-600 
                 = workspace.news_pieces.where.not(summary: [nil, '']).count
               .text-gray-500 Analyzed

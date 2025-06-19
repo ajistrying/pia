@@ -29,7 +29,11 @@ class CompanyWorkspacesController < ApplicationController
         @ratio_tab = params[:ratio_tab] || 'profitability'
         render partial: 'tab_financial_ratios', locals: { workspace: @workspace, active_tab: @ratio_tab }
       when 'news-sentiment'
-        render partial: 'tab_news_sentiment', locals: { workspace: @workspace }
+        if @workspace.refresh_in_progress?('news')
+          render partial: 'tab_news_sentiment_loading'
+        else
+          render partial: 'tab_news_sentiment', locals: { workspace: @workspace }
+        end
       when 'financial-statements'
         render partial: 'tab_financial_statements', locals: { workspace: @workspace }
       else
@@ -67,16 +71,14 @@ class CompanyWorkspacesController < ApplicationController
     # TODO: Call your SEC filings interactor here
     # Example: FinancialModelingPrep::ProcessSecFilings.call(company_symbol: @workspace.company_symbol, workspace: @workspace)
     
-    flash[:notice] = "SEC filings refresh initiated. Data will be updated shortly."
-    redirect_to company_workspace_path(@workspace)
+    head :ok
   end
 
   def refresh_financial_ratios
     # TODO: Call your financial ratios interactor here
     # Example: FinancialModelingPrep::ProcessKeyRatios.call(company_symbol: @workspace.company_symbol, workspace: @workspace)
     
-    flash[:notice] = "Financial ratios refresh initiated. Data will be updated shortly."
-    redirect_to company_workspace_path(@workspace)
+    head :ok
   end
 
   def refresh_news_sentiment
@@ -88,25 +90,23 @@ class CompanyWorkspacesController < ApplicationController
       partial: "company_workspaces/tab_news_sentiment_loading"
     )
 
-    # RefreshNewsJob.perform_later(@workspace.id)
-    sleep 4
+    processing_task = @workspace.refresh_in_progress?("news_refresh")
 
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "workspace_#{@workspace.id}",
-      target: "news-section",
-      partial: "company_workspaces/tab_news_sentiment",
-      locals: { workspace: @workspace }
-    )
+    if processing_task
+      Rails.logger "A news refresh is already underway"
+      head :ok
+    end
+
+    RefreshNewsJob.perform_later(@workspace.id)
     
-    head :ok  # Return success without redirect
+    head :ok
   end
 
   def refresh_financial_statements
     # TODO: Call your financial statements interactor here
     # Example: FinancialModelingPrep::ProcessFinancialStatements.call(company_symbol: @workspace.company_symbol, workspace: @workspace)
     
-    flash[:notice] = "Financial statements refresh initiated. Data will be updated shortly."
-    redirect_to company_workspace_path(@workspace)
+    head :ok
   end
 
   private

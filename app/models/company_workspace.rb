@@ -26,8 +26,17 @@ class CompanyWorkspace < ApplicationRecord
   has_many :news_pieces, dependent: :destroy
   has_many :financial_statements, dependent: :destroy
   has_many :workspace_task_completions, dependent: :destroy
+  has_many :company_workspace_processing_tasks, dependent: :destroy
 
   def up_to_date?
     initialized_at.present? && last_successful_update && last_successful_update > 2.days.ago
+  end
+  
+  def refresh_in_progress?(task_type)
+    company_workspace_processing_tasks.exists?(task_type: "#{task_type}")
+  end
+  
+  def active_refreshes
+    company_workspace_processing_tasks.pluck(:task_type).map { |type| type.gsub('_refresh', '') }
   end
 end

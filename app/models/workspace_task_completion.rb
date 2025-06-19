@@ -21,8 +21,7 @@
 class WorkspaceTaskCompletion < ApplicationRecord
   belongs_to :company_workspace
   
-  validates :task_type, presence: true, 
-            inclusion: { in: WorkspaceUpdateTracker::TASK_TYPES }
+  validates :task_type, presence: true, inclusion: { in: WorkspaceUpdateTracker::TASK_TYPES }
   validates :completed_at, presence: true
   validates :task_type, uniqueness: { scope: :company_workspace_id }
 end 

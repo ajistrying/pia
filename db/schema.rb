@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_06_16_152031) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_18_230923) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -26,6 +26,15 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_16_152031) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_workspace_id"], name: "index_analyst_ratings_on_company_workspace_id"
+  end
+
+  create_table "company_workspace_processing_tasks", force: :cascade do |t|
+    t.bigint "company_workspace_id", null: false
+    t.string "task_type"
+    t.datetime "started_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_workspace_id"], name: "idx_on_company_workspace_id_e31b0c615a"
   end
 
   create_table "company_workspaces", force: :cascade do |t|
@@ -125,6 +134,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_16_152031) do
   end
 
   add_foreign_key "analyst_ratings", "company_workspaces"
+  add_foreign_key "company_workspace_processing_tasks", "company_workspaces"
   add_foreign_key "earnings_calls", "company_workspaces"
   add_foreign_key "financial_statements", "company_workspaces"
   add_foreign_key "key_ratios", "company_workspaces"
